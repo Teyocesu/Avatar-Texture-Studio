@@ -37,6 +37,8 @@ The preserved [upstream manual](Packages/com.teyocesu.avatar-texture-studio/Docu
 
 Existing PNG replacement always asks for approval. **Overwrite Source** remains explicit for PNG sources; **Create Texture** for an empty slot exports and asks before assignment. Enabling assignment asks before changing selected shared material assets and every renderer using them. Assignment supports Unity Undo; file replacement does not. Extract embedded FBX materials before assignment. New exports copy source importer settings; new masks use linear data semantics and do not paint alpha. Export rejects paths outside Assets and symbolic links/junctions.
 
+If existing-file replacement fails, the error identifies retained recovery paths: the previous data may be at the original path or a `.backup.tmp` file, and completed new data may remain in a `.tmp` file. Keep those files. Copy project data to a new `.mtpaint` filename before reopening, or PNG data to a new `.png` filename. Successful replacement removes its transaction backup. Actual Unity Mono/Windows failure recovery still requires the QA checklist.
+
 ## Compare without ending painting
 
 In **Compare**, select imported Texture2D A/B assets. Use **Side by Side**, **A**, **B**, **Overlay** (B opacity), or **Difference**. Scroll to zoom, drag to pan, double click or **Fit** to reset. Navigation is shared in normalized coordinates; Zoom × fit is relative to each pane, not a 1:1 pixel measure.

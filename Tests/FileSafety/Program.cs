@@ -13,10 +13,10 @@ internal static class Program
         Console.WriteLine("FILETEST PASS " + message);
     }
 
-    static void Reject<T>(Action action, string message) where T : Exception
+    static T Reject<T>(Action action, string message) where T : Exception
     {
         try { action(); }
-        catch (T) { Console.WriteLine("FILETEST PASS " + message); return; }
+        catch (T error) { Console.WriteLine("FILETEST PASS " + message); return error; }
         throw new Exception("Expected " + typeof(T).Name + ": " + message);
     }
 
@@ -40,6 +40,7 @@ internal static class Program
             string fresh = Path.Combine(scratch, "new.png");
             SafeFileIO.Write(fresh, s => s.WriteByte(7), false);
             Require(File.ReadAllBytes(fresh).SequenceEqual(new byte[] { 7 }), "new destination is created without overwrite permission");
+            Require(!Directory.EnumerateFiles(scratch, "*.tmp").Any(), "successful replacement removes its transaction backup");
 
             Directory.CreateDirectory(Path.Combine(scratch, "Assets", "Textures"));
             Require(SafeFileIO.ExportAssetPath("Assets/Textures/new.PNG", scratch) == "Assets/Textures/new.PNG", "PNG export normalizes inside Assets");
@@ -55,6 +56,25 @@ internal static class Program
             File.CreateSymbolicLink(Path.Combine(scratch, "Assets", "alias.png"), Path.Combine(outside, "source.png"));
             Reject<InvalidOperationException>(() => SafeFileIO.ExportAssetPath("Assets/alias.png", scratch), "symbolic-link destination is rejected");
             Require(File.ReadAllText(Path.Combine(outside, "source.png")) == "source", "linked source remains unchanged");
+
+            string replacement = Path.Combine(scratch, "replacement.mtpaint");
+            File.WriteAllText(replacement, "previous painting");
+            string completed = null, backup = null;
+            var replacementError = Reject<IOException>(() => SafeFileIO.Write(replacement, s => s.WriteByte(99), true, (source, destination, previous) => {
+                completed = source;
+                backup = previous;
+                // Documented ReplaceFileW failure states: 1176 without backup, 1177 with backup.
+                if (previous == null) File.Delete(destination);
+                else File.Move(destination, previous);
+                throw new IOException("Injected partial native replacement failure");
+            }), "partial replacement failure propagates (injected Win32 failure state)");
+            string retained = File.Exists(replacement) ? replacement : backup;
+            Require(retained != null && File.Exists(retained) && File.ReadAllText(retained) == "previous painting",
+                "partial replacement failure retains previous painting bytes");
+            Require(completed != null && File.Exists(completed) && File.ReadAllBytes(completed).SequenceEqual(new byte[] { 99 }),
+                "partial replacement failure retains completed new pixels for recovery");
+            Require(replacementError.Message.Contains(completed) && replacementError.Message.Contains(backup),
+                "replacement error identifies both recovery files");
 
             string root = args.Length == 0 ? Directory.GetCurrentDirectory() : args[0];
             var sources = Directory.EnumerateFiles(Path.Combine(root, "Packages"), "*.cs", SearchOption.AllDirectories)

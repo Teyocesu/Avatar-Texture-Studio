@@ -2,6 +2,8 @@
 
 ## Avatar Texture Studio 0.1.0 — Shot 1 (unreleased)
 
+- Independent review F1: check GPU formats by actual render/sample/filter/readback/blend use. Keep ARGB32 layer and RGHalf stroke blending requirements; remove unrelated blend requirements from capture/depth/coverage buffers. No shader arithmetic changes.
+- Preserve named backup and completed temporary data on failed existing-file replacement; expose recovery paths instead of deleting the last recoverable pixels after a partial Windows replacement failure.
 - Integrate MIT VRC Texture Painter 1.2.0 at `29bbf3c728d55091190413066e549b0bbbb21bf6`; retain GPU algorithms, GUIDs, brushes, layers, masks, undo and editable projects.
 - Distinct package/assembly/namespace/shader/editor identity; one window with Painting, Masks and Compare; avatar-root mesh selection.
 - Read-only A/B, side-by-side, overlay, alpha and absolute RGBA difference, metadata and synchronized navigation.

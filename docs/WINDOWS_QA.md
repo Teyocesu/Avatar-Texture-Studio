@@ -33,6 +33,12 @@ Require the final `MTPTEST DONE failures=0` and `ATSTEST DONE exit=0`, no compil
 
 Optional development check: `dotnet run --project Tests/FileSafety/FileSafety.csproj -- <absolute-repository-path>` requires .NET 8 and link-creation permission. It tests filesystem failure/escape behavior and C# syntax, independently of Unity. It does not replace either GPU suite.
 
+## Independent review F1 and replacement recovery
+
+- Record native per-format Render/Sample/Linear/Blend/ReadPixels capability results against the matrix in VERIFICATION.md. Confirm ARGB32 and RGHalf blending remain required. RFloat/R8/ARGBHalf/RHalf blending is not a painting requirement. Where a device reports one of those unused blend capabilities false but all required operations true, confirm painting can start; no such hardware case has been executed yet.
+- Verify occlusion, ordinary/max stroke accumulation, gradient, padding, blur and Blend/Flatten (including generated capture mips), plus sRGB/data previews and undo/copying. Capability reporting alone does not pass these flows.
+- In the isolated project, exercise Unity Mono existing-file replacement on Windows: successful overwrite, a locked/read-only destination, and explicit cancellation. Check original/recovery bytes and visible errors. Retain any recovery paths named by a replacement error; copy a retained project to a new `.mtpaint` path or image to a new `.png` path to inspect it. The .NET test injects documented Win32 partial-failure states; it does not execute actual native error 1176/1177 or prove crash/power-loss durability.
+
 ## Manual interaction and asset safety
 
 - Select a plain mesh and a synthetic skinned mesh; then a root with multiple meshes. Confirm material/texture/UV selection, invalid/missing targets and unsupported mappings are clear. Include mirrored/overlapping UVs, a seam, non-square textures, multiple material slots and multiple color textures/UV channels.

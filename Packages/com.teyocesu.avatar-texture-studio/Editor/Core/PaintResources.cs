@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Experimental.Rendering;
 using UnityEditor;
 using Object = UnityEngine.Object;
 
@@ -56,10 +57,37 @@ namespace AvatarTextureStudio.Painting
             if (GraphicsSettings.currentRenderPipeline != null) return "Painting requires the Built-in Render Pipeline.";
             if (SystemInfo.graphicsShaderLevel < 45) return "Painting requires shader model 4.5 and a real graphics device.";
             foreach (var format in new[] { RenderTextureFormat.ARGB32, RenderTextureFormat.ARGBHalf,
-                RenderTextureFormat.RHalf, RenderTextureFormat.RGHalf, RenderTextureFormat.RFloat, RenderTextureFormat.R8, RenderTextureFormat.Depth })
-                if (!SystemInfo.SupportsRenderTextureFormat(format)
-                    || (format != RenderTextureFormat.Depth && !SystemInfo.SupportsBlendingOnRenderTextureFormat(format)))
-                    return "Painting requires render-target and blending support for " + format + ".";
+                RenderTextureFormat.RHalf, RenderTextureFormat.RGHalf, RenderTextureFormat.RFloat, RenderTextureFormat.R8 })
+            {
+                var graphicsFormat = GraphicsFormatUtility.GetGraphicsFormat(format, false);
+                foreach (var usage in new[] { FormatUsage.Render, FormatUsage.Sample })
+                    if (!SystemInfo.IsFormatSupported(graphicsFormat, usage))
+                        return $"Painting requires {usage} support for {format} ({graphicsFormat}). Use a graphics device/API that supports this operation.";
+
+                // UVSpace passes 2-4 blend into layers; passes 1/5 accumulate RGHalf strokes with Max.
+                // ViewSpace captures, RFloat occlusion and R8 coverage overwrite their targets.
+                if ((format == RenderTextureFormat.ARGB32 || format == RenderTextureFormat.RGHalf)
+                    && !SystemInfo.IsFormatSupported(graphicsFormat, FormatUsage.Blend))
+                    return $"Painting requires blending for {format} ({graphicsFormat}) for layer filtering or stroke accumulation. Use a supported graphics device/API.";
+
+                if ((format == RenderTextureFormat.ARGB32 || format == RenderTextureFormat.ARGBHalf || format == RenderTextureFormat.RHalf)
+                    && !SystemInfo.IsFormatSupported(graphicsFormat, FormatUsage.Linear))
+                    return $"Painting requires linear filtering for {format} ({graphicsFormat}) for previews and blur/blend captures. Use a supported graphics device/API.";
+
+                if (format == RenderTextureFormat.ARGB32 && !SystemInfo.IsFormatSupported(graphicsFormat, FormatUsage.ReadPixels))
+                    return $"Painting requires pixel readback for {format} ({graphicsFormat}) for picking, projects and PNG export. Use a supported graphics device/API.";
+            }
+            if (!SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.Depth))
+                return "Painting requires depth attachments for occlusion and blur/blend captures. Use a graphics device/API with depth render-texture support.";
+            if (RTUtil.LinearProject)
+            {
+                var previewFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.ARGB32, true);
+                foreach (var usage in new[] { FormatUsage.Render, FormatUsage.Sample, FormatUsage.Linear })
+                    if (!SystemInfo.IsFormatSupported(previewFormat, usage))
+                        return $"Color painting requires {usage} support for sRGB previews ({previewFormat}). Use a supported graphics device/API.";
+            }
+            if ((SystemInfo.copyTextureSupport & CopyTextureSupport.Basic) == 0)
+                return "Painting requires basic same-type Graphics.CopyTexture support for layer composites and undo snapshots. Use a supported graphics device/API.";
             foreach (string name in new[] { "Hidden/AvatarTextureStudio/Painting/UVSpace", "Hidden/AvatarTextureStudio/Painting/ViewSpace",
                 "Hidden/AvatarTextureStudio/Painting/Blit", "Hidden/AvatarTextureStudio/Painting/GUI" })
             {

@@ -6,4 +6,8 @@ Upstream is pinned to `29bbf3c728d55091190413066e549b0bbbb21bf6` (1.2.0); see do
 
 Available checks passed for file safety, C# 9 syntax, package/provenance/GUID/shader integrity and tarball contents. See docs/VERIFICATION.md for exact evidence and the inherited upstream-meta whitespace exception. The ignored local tarball is reproducible with `python3 tools/package.py`.
 
-Next: use licensed Unity 2022.3.22f1 on Windows 11, open **Tests/UnityProject**, and execute **docs/WINDOWS_QA.md**. Real Unity compilation, GPU/Metal, lifecycle/undo/project/export interaction and Windows/avatar QA remain NOT TESTED. No owner avatar project was touched. Preserve those blocked gates; fix observed failures before accepting Shot 1 or starting broader features.
+Independent review correction starts at `ddba6efc50c6213239c67c38f386742d2335bed7`. F1 now checks actual format usages: blending only for ARGB32 layers and RGHalf strokes; capture/depth/coverage buffers no longer need blending. See the format/pass matrix in docs/VERIFICATION.md. A real device false-negative has not been reproduced; shader arithmetic is unchanged.
+
+Follow-up P1: Windows replacement can partially fail. SafeFileIO now requests a backup and retains completed/recovery files on replacement failure, with paths in the error. The focused injected-failure regression failed before the fix and passes afterward on .NET 8/macOS; this does not prove native Unity Mono/Windows behavior. Keep recovery files if an error occurs; use new `.mtpaint`/`.png` names to inspect them.
+
+Next: use licensed Unity 2022.3.22f1 on Windows 11, open **Tests/UnityProject**, and execute **docs/WINDOWS_QA.md**, including F1 capabilities, mips/Max blending and Mono replacement recovery. Real Unity compilation, GPU/Metal, lifecycle/undo/project/export interaction and Windows/avatar QA remain NOT TESTED. No owner avatar project was touched. Keep PR #1 draft; do not start Shot 2, merge or release.

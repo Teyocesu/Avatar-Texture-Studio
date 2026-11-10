@@ -10,6 +10,8 @@ Save/Save As and Open Project keep editable `.mtpaint` work. Reload/Play transit
 
 Export PNG creates a flattened 8-bit image. Assignment defaults off. Existing-file replacement and shared-material assignment require explicit approval. Overwrite Source and Create Texture remain available with these checks. Export must use ordinary Assets paths, not links/junctions. Save projects separately to retain layers.
 
+Replacement failures identify retained `.backup.tmp` and completed `.tmp` recovery files. Keep them and copy recoverable data to a new `.mtpaint` or `.png` filename. Successful replacement removes its backup. Unity Mono/Windows recovery remains unverified.
+
 Compare supports imported A/B assets with side-by-side, A, B, opacity-controlled overlay, alpha and absolute RGBA difference. Scroll/drag share fit-relative zoom and normalized pan. Unequal dimensions disable overlay/difference. Read/Write may stay off. Normal-map, virtual-only, HDR/float and GPU-unsupported formats explain their limits. Use Raw data values for masks. Comparison never writes assets; returning to painting keeps sessions open.
 
 Painting derives from **VRC Texture Painter 1.2.0**, commit `29bbf3c728d55091190413066e549b0bbbb21bf6`, © 2026 ToffelsKater, MIT. See LICENSE.md, THIRD_PARTY_NOTICES.md and the historical `Documentation~/Upstream-README.md` for brush details. Follow Studio's current installation/export rules where the old manual differs.

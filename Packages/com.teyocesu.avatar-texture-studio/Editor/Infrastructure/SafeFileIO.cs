@@ -7,10 +7,14 @@ namespace AvatarTextureStudio.Infrastructure
     internal static class SafeFileIO
     {
         public static void Write(string path, Action<Stream> write, bool overwrite)
+            => Write(path, write, overwrite, File.Replace);
+
+        internal static void Write(string path, Action<Stream> write, bool overwrite, Action<string, string, string> replaceFile)
         {
             string fullPath = Path.GetFullPath(path);
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
             string temporary = fullPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            bool retainTemporary = false;
             try
             {
                 using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
@@ -18,12 +22,26 @@ namespace AvatarTextureStudio.Infrastructure
                     write(stream);
                     stream.Flush(true);
                 }
-                if (overwrite && File.Exists(fullPath)) File.Replace(temporary, fullPath, null);
+                if (overwrite && File.Exists(fullPath))
+                {
+                    string backup = fullPath + "." + Guid.NewGuid().ToString("N") + ".backup.tmp";
+                    try
+                    {
+                        replaceFile(temporary, fullPath, backup);
+                    }
+                    catch (Exception e)
+                    {
+                        // ReplaceFileW can rename the original before failing; retain both recovery files.
+                        retainTemporary = true;
+                        throw new IOException($"Could not replace '{fullPath}': {e.Message} Previous data may remain at the original path or '{backup}'. Completed new data is retained at '{temporary}' if present. Keep these files for recovery.", e);
+                    }
+                    if (File.Exists(backup)) File.Delete(backup);
+                }
                 else File.Move(temporary, fullPath);
             }
             finally
             {
-                if (File.Exists(temporary)) File.Delete(temporary);
+                if (!retainTemporary && File.Exists(temporary)) File.Delete(temporary);
             }
         }
 
