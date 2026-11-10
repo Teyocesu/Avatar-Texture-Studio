@@ -1,0 +1,10 @@
+{
+    "name": "AvatarTextureStudio.Upstream.Tests",
+    "references": [
+        "AvatarTextureStudio.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": false
+}

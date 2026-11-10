@@ -105,5 +105,17 @@ InitTestScene*.unity*
 # UI Toolkit auto generated files
 /UIElementsSchema/
 
+# Isolated development harness and local verification outputs
+**/Library/
+**/Temp/
+**/Logs/
+**/UserSettings/
+**/obj/
+**/bin/
+**/__pycache__/
+.DS_Store
+!Tests/FileSafety/FileSafety.csproj
+/artifacts/
+
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
