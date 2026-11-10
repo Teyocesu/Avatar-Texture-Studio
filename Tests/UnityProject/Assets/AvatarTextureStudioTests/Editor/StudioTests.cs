@@ -43,6 +43,7 @@ namespace AvatarTextureStudio.Tests
                 MalformedProjects(scratch);
                 ExportAndComparisonSession(folder);
                 ComparePixels();
+                CreativeIntegrationTests.Run(folder, scratch);
                 code = 0;
             }
             catch (Exception e) { Debug.LogError("ATSTEST FAIL " + e); }

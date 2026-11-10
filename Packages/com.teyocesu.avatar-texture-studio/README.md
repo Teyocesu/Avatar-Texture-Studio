@@ -1,6 +1,6 @@
-# Avatar Texture Studio — Shot 1
+# Avatar Texture Studio — Creative Studio
 
-Editor-only painting, layers, per-channel shader masks, editable `.mtpaint` projects, safe PNG export and read-only TextureLab Compare. Target **Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11**. **Implemented but not accepted:** real Unity compilation, GPU interaction and Windows QA are pending.
+Editor-only painting, layers, per-channel masks, UV Explorer, editable region Colorways, manual Face Studio and TextureLab Compare. Target **Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11**. **Shots 1 and 2 are implemented but not accepted:** real Unity compilation, GPU interaction and Windows QA are pending. Version 0.2.0 is unreleased.
 
 Install in an isolated empty 3D Built-in project first. Remove VRC Texture Painter: retained asset GUIDs prevent co-installation. Add this package's `package.json` through Package Manager > Add package from disk, or install its locally built `.tgz` through Add package from tarball.
 
@@ -13,6 +13,14 @@ Export PNG creates a flattened 8-bit image. Assignment defaults off. Existing-fi
 Replacement failures identify retained `.backup.tmp` and completed `.tmp` recovery files. Keep them and copy recoverable data to a new `.mtpaint` or `.png` filename. Successful replacement removes its backup. Unity Mono/Windows recovery remains unverified.
 
 Compare supports imported A/B assets with side-by-side, A, B, opacity-controlled overlay, alpha and absolute RGBA difference. Scroll/drag share fit-relative zoom and normalized pan. Unequal dimensions disable overlay/difference. Read/Write may stay off. Normal-map, virtual-only, HDR/float and GPU-unsupported formats explain their limits. Use Raw data values for masks. Comparison never writes assets; returning to painting keeps sessions open.
+
+UV Explorer, Colorway and Face Studio share a renderer/material/property/channel, navigation, surface selection and creative document. Adopt the open painting target or select one manually. Inspect source UV0–UV7 with triangle edges and Scene highlighting; raw layout shows out-of-range UVs. Overlapping/wrapped reverse picks require an explicit surface choice. Geometry and shader sampling are distinct: triangle masks/model preview support `_MainTex` / UV0 on Standard and the ordinary Unlit texture shaders. Custom/non-UV/decal mappings warn and remain geometry inspection. Clamp/MirrorOnce border collapse, degenerate UVs and tile/geometry budgets are disclosed. Picking is limited to the selected renderer; no meshes/UVs are edited.
+
+Capture a supported color baseline or matching painting composite, create a named region and add UV triangles. Refine with interpolated add/subtract pixel brushes. Hue/chroma/strength use fixed-lightness Oklab with gamut reduction, source sRGB/linear transfer and one RGBA8 quantization. Unselected pixels and all alpha bytes remain exact. Update/cancel preview, use Creative Undo/Redo, show a temporary model tint, and compare owned snapshots in TextureLab. Shared UV pixels affect every corresponding surface. Normal/data-mask/HDR sources are excluded from color processing.
+
+Save editable `.atsstudio` files separately; related painting Save also writes `<painting>.atsstudio`. The self-contained ATSCRV01 version 1 sidecar stores baseline, mask bitsets, parameters, Face flags, binding and navigation, with checked payload length and bounded decoding. MTPAINT1/2 stays unchanged. Pair saving is two independent file transactions; partial failure is visible and keeps creative work dirty. Library creative recovery uses SessionState; restart recovery requires manual Open Studio and target selection. History is session-local. Limits: 8192 per axis, 32 regions, 512 MiB decoded data with metadata reserve, 24 creative history steps / 128–256 MiB retained snapshots.
+
+Face presets are manually named regions. Turn on **Paint with existing tools** to reuse the matching color painting session and its brushes/layers. Masks constrain Colorway; the original brush behavior remains unchanged. Identity material scale/offset is required for Face painting. Capture the composite explicitly to refresh a frozen Colorway baseline. Export Colorways only to a **new PNG** under Assets; its new importer preserves transfer/alpha/dimensions/wrap. Existing files and source assets are preserved, with no automatic material assignment.
 
 Painting derives from **VRC Texture Painter 1.2.0**, commit `29bbf3c728d55091190413066e549b0bbbb21bf6`, © 2026 ToffelsKater, MIT. See LICENSE.md, THIRD_PARTY_NOTICES.md and the historical `Documentation~/Upstream-README.md` for brush details. Follow Studio's current installation/export rules where the old manual differs.
 

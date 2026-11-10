@@ -1,4 +1,14 @@
-# Shot 1 execution plan
+# Shot 2 execution plan
+
+Active contract: Shot 2 in SPEC.md. Branch `codex/shot-2-creative-studio`, exact base `9b1d2f0e43883079e5a3596a49832cbd0668b77e`; stacked draft PR targets Shot 1's branch. Shot 1 remains unaccepted and its branch is unchanged.
+
+1. **Contract and context — complete.** Read canonical docs, source boundaries and prior evidence; document sidecar, color method, correspondence/ambiguity and file-safety rules before implementing derived operations. Unity/Hub still unavailable; temporary .NET SDK is available for real CPU/file tests.
+2. **Read-only UV correspondence — implemented.** The pure forward/reverse/wrap/ambiguity tests passed before region-derived operations were added. Native source/posed-mesh adapter and shared selection UI are implemented; actual Unity interaction/skinning remains NOT TESTED.
+3. **Regions, Colorway and persistence — implemented.** Immutable binary masks, reversible edits, Oklab processing and ATSCRV01 sidecars are covered by executed CPU isolation/alpha/color/history/round-trip/bounds regressions. A missing gzip-footer regression failed before adding checked payload length and passes afterward. Native capture/preview/recovery remains NOT TESTED.
+4. **Connected Face/painting/Compare workflows — implemented.** Shared workspaces, manual Face presets, existing color brushes/layers, owned TextureLab snapshots and lifecycle routing are integrated. Existing tests are preserved and native adapter/capture/recovery regressions added but unexecuted. User workflows, architecture and Windows procedures are documented.
+5. **Review, documentation and stacked draft PR — active.** Finish fresh available checks and package 0.2.0 verification; review the complete base-relative diff and weakened-verification risks; record evidence/HANDOFF; verify Teyocesu identities, commit/push and create the draft against `codex/shot-1-painting-foundation`. No merge/release. Acceptance remains blocked on the inherited and new native gates.
+
+## Shot 1 historical execution
 
 Contract: [SPEC.md](SPEC.md). Baseline: `12bf05d397c46dbab7a12f438cf0878d217b52a9`. Branch: `codex/shot-1-painting-foundation`.
 

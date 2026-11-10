@@ -1,4 +1,48 @@
-# Avatar Texture Studio — Shot 1
+# Avatar Texture Studio — Canonical specification
+
+Shot 2 below is the active contract. Shot 1 remains the foundation contract and is **implemented but not accepted**; this branch does not alter its acceptance status.
+
+## Shot 2 — Creative Studio
+
+### Delivery and scope
+
+Stack `codex/shot-2-creative-studio` from exact Shot 1 commit `9b1d2f0e43883079e5a3596a49832cbd0668b77e`; draft PR targets `codex/shot-1-painting-foundation`. Do not modify that branch or main, merge, tag, release, or load the owner's avatar project. Retain editor-only Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11 as the primary target, with Metal unverified.
+
+One IMGUI window retains Painting, Masks and Compare and adds UV Explorer, Colorway and Face Studio. All creative workspaces share one inspected renderer/material slot/property/channel, UV navigation, explicit surface selection and creative document. Existing painting sessions/layers remain open when changing workspace. Face Studio invokes the existing color-paint session/tools, not a second paint engine. Region restrictions apply to Colorway adjustments; existing brush behavior remains the upstream layer workflow.
+
+### UV correspondence before derived editing
+
+Use source mesh UV0–UV7 and submesh/material-slot associations, with posed world vertices for Scene correspondence. Reuse upstream mesh selection, submesh association, scale-aware skin bake resolution, pose hashing and restorable property-block preview. Keep source geometry/UVs immutable. The mathematical correspondence kernel is independent of Unity and must pass synthetic forward/reverse/wrap/ambiguity tests before region-derived operations are implemented.
+
+UV Explorer shows texture, triangle edges, selected polygons, UV/pixel coordinates, material/property/channel, and shared pan/zoom. Scene picking maps a nearest surface to source UV, material scale/offset and wrapped texture UV. Reverse lookup returns **all** candidate surfaces/aliases; multiple hits require explicit user choice and never default to the first. Equal-depth Scene hits are also explicit candidates. Collapsed UVs are reported, not rasterized into regions. Repeat/Mirror clip triangles into sampled tiles; Clamp/MirrorOnce border collapse is many-to-one and flagged rather than treated as a unique inverse. Raw transformed UV layout remains inspectable outside 0–1. Tile spans beyond 16 per axis are reported as unsupported for wrapped selection, matching the existing painting ceiling.
+
+Shader correspondence is supported for ordinary UV texture mapping and material scale/offset. Known non-UV modes, transformed decals, channel disagreement and unverified custom shader mappings must be labelled. Raw UV inspection remains available; derived geometry selections require a supported correspondence. Explicit pixel/brush masking remains an image-space operation. Color sampling is available for supported color sources and can update the shared brush color; normal/data-mask sampling must not masquerade as color editing.
+
+### Regions and color processing
+
+Capture an immutable RGBA8 baseline from the chosen color-paint document's composite, or a supported imported color texture without changing its importer. Named regions are immutable binary pixel masks refined with UV triangles and add/subtract circular pixel brushes. Every edit is reversible through bounded creative Undo/Redo. Region overlays are visible on the texture and model through temporary previews. Shared/mirrored UV pixels necessarily affect all corresponding surfaces; disclose that limitation.
+
+Use one method: sRGB transfer decoding when the source is sRGB, Oklab hue rotation/chroma scaling at fixed perceptual lightness L, strength interpolation in a/b, and radial chroma reduction into the RGB gamut at fixed L. Encode back to the source transfer function and quantize once to RGBA8. Alpha is copied exactly; unselected pixels remain byte-identical. Identity/zero-strength adjustments are exact no-ops. Regions apply in list order; disabling or changing any adjustment remains editable. This preserves Oklab lightness/shading within 8-bit quantization, not exact physical luminance Y. No normal maps, shader-data masks, HDR or unsupported color sources enter this processing path.
+
+Preview is explicit and cancellable for large textures; export computes current edits and writes a **new** PNG asset without assignment or overwrite. Colorway results remain a separate editable adjustment document, avoiding a flattened layer that would falsely claim editable parameters or change alpha through double compositing. Refreshing a baseline is explicit and reversible at the same dimensions; replacing it at different dimensions requires saving/discarding the prior creative work.
+
+Face Studio is a focused view of the same regions, with named face-preset flags, precise navigation, sampling, the existing painting tools and masked recoloring. Users choose anatomy/mesh/regions manually. Compare accepts the owned before/after snapshots as read-only transient previews in TextureLab, while regular asset comparison remains available.
+
+### Persistence decision (fixed before implementation)
+
+Keep `.mtpaint` MTPAINT1/2 bytes and loader compatibility unchanged. Creative documents use a self-contained, versioned `.atsstudio` sidecar: magic `ATSCRV01`, version 1, a checked compressed-byte length, and bounded binary metadata and gzip payload containing immutable baseline RGBA8, source transfer semantics, renderer/material/property/UV/wrap/transform binding, named mask bitsets, editable adjustment parameters, Face preset flags and navigation/active-region state. No Unity object references are serialized. This is editable state, not just an exported image. The length field was added before any delivery after an executed regression showed that a complete decoded payload with a truncated gzip footer can otherwise be accepted by .NET.
+
+Standalone Save/Open is available. Saving a related color painting project also writes `<painting>.atsstudio`; opening it offers/restores a matching companion without discarding dirty creative work. Each file is independently replaced using Shot 1 SafeFileIO; the pair is **not** a multi-file transaction. A partial save is reported and the creative document stays dirty. Autosave/restore across Play/reload uses a separate Library creative file and retains original project path/dirty state. Failed loads never replace the current document; malformed payloads are bounded and rejected visibly. Editor restart recovery is manual as in Shot 1.
+
+Limits: 8192 per texture axis, 32 regions, 512 MiB decoded creative data (1 MiB reserved for metadata), 4096 characters per text field, and session-local history of at most 24 steps / 128 MiB of retained unique data, raised to one baseline's byte size when larger (maximum 256 MiB) so a full-size baseline refresh stays undoable. Geometry is bounded to 250,000 source triangles per selected slot and approximately one million sampled fragments; triangles beyond the fragment budget stay raw-inspectable and are flagged. Mask precision is one bit per pixel; recolored output is RGBA8. No source textures/materials/meshes/importers, runtime/avatar components or upstream GUIDs are mutated by creative operations. New PNG importer settings may be set to preserve the exported result. All temporary textures, previews and Scene subscriptions are released/restored.
+
+### Evidence and exclusions
+
+Execute synthetic CPU checks for correspondence/ambiguity, mirrored/wrapped/collapsed UVs, material/channel association, region isolation, alpha/outside-mask preservation, color semantics, reversible edits, sidecar round trips/corruption and file safety. Preserve all existing tests. Run package/GUID/license checks, inspect the complete stacked diff and document Windows procedures. Native Unity import/API compilation, GPU/Metal, Scene/IMGUI interaction, skinning and Windows/avatar acceptance remain NOT TESTED without actual execution. CPU tests are not substitutes for those gates.
+
+No UV remapping, mesh editing, anatomy recognition, AI textures, texture transfer, seam/mipmap repair, new painting engine, accounts/cloud, monetization or publishing. Shot 2 may be implemented but cannot be accepted until its native gates and inherited Shot 1 gates pass.
+
+## Shot 1 foundation contract
 
 ## Objective and users
 

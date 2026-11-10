@@ -1,5 +1,14 @@
 # Changelog
 
+## Avatar Texture Studio 0.2.0 — Shot 2 (unreleased)
+
+- Add UV Explorer with source UV0–UV7, material-slot geometry, posed surface correspondence, wrap-aware reverse lookup, explicit ambiguity choice and shared navigation.
+- Add named binary regions with triangle selection and interpolated add/subtract pixel masking, reversible edits, fixed-lightness Oklab hue/chroma/strength adjustments and exact alpha/unselected RGBA8 preservation.
+- Add self-contained ATSCRV01 `.atsstudio` editable projects, checked payload length/bounds, painting companions and Library recovery; retain MTPAINT1/2 unchanged.
+- Add manual Face presets, shared painting tools/layers and owned before/after snapshots in TextureLab. Preserve source assets and restore temporary model previews.
+- Export Colorways only to new PNG paths, with matching transfer, alpha, dimensions and wrap import settings. No assignment or source overwrite.
+- Add executed CPU regressions and unexecuted Unity integration checks. Actual Unity compilation, rendering, skinning, interaction and Windows/Metal acceptance remain NOT TESTED. Shot 1 remains unaccepted; no release is published.
+
 ## Avatar Texture Studio 0.1.0 — Shot 1 (unreleased)
 
 - Independent review F1: check GPU formats by actual render/sample/filter/readback/blend use. Keep ARGB32 layer and RGHalf stroke blending requirements; remove unrelated blend requirements from capture/depth/coverage buffers. No shader arithmetic changes.
