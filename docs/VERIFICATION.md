@@ -1,4 +1,54 @@
-# Shot 2 verification — 2026-11-10
+# Shot 3 verification — 2026-11-10
+
+**Planned implementation complete; NOT ACCEPTED.** Scope is `codex/shot-3-quality-studio` from exact Shot 2 commit `a5c90a471a8af9c75ead8cb366c891f6ef89738a`. [Draft PR #3](https://github.com/Teyocesu/Avatar-Texture-Studio/pull/3), authored by Teyocesu, targets `codex/shot-2-creative-studio`. Main and earlier feature branches remain unchanged. This final planned implementation phase does not waive any Shot 1/2 native acceptance gate or authorize a release. Git/PR records the delivery head.
+
+## Current executed evidence
+
+The macOS Apple Silicon host has no Unity/Hub in PATH, standard application/license locations or Spotlight and no usable Unity editor/license pair. Windows hardware/Direct3D11 and native Metal product execution are unavailable. No owner avatar project was opened. The temporary official .NET 8.0.427 SDK remains outside Git/package contents.
+
+| Classification | Evidence and limit |
+| --- | --- |
+| **Automatically tested — executed, exit 0** | The existing .NET harness compiles/runs actual SafeFileIO, Creative/Core and Quality/Core code. Every prior filesystem/creative assertion remains and passes. Quality fixtures cover an indexed-connected UV-split cylinder, matched reversed edges/UV direction, unrelated disconnected coincidence rejection, material/channel boundaries, mirrored UVs and existing fragment rejection, continuous and deliberate hard colors, alpha-only and hidden-color/data cases, Oklab/sRGB/linear semantics, NPOT full-area mip reduction, contamination, preservation, cancellation, limits and new-only reports. UV precision insufficient for half-texel insets remains unmeasured. |
+| **Automatically tested — executed, exit 0** | The sparse-alpha regression first failed: averaging a 1/255-alpha colored pixel into 2×2 made output alpha zero but kept RGB. The encoder now clears color RGB when the quantized alpha is zero, leaving raw-data channels independent. The identical test passes afterward. No assertion/threshold was weakened. |
+| **Automatically tested — executed, exit 0** | C# 9 syntax parsing covers **30 package/Unity-harness sources**. Latest output has no compiler warnings/errors. The pure core compiles against .NET 8; **Unity API/assembly/shader compilation did not run**. The ignored `artifacts/shot3-cpu.log` retains the actual output. |
+| **Automatically tested — executed, exit 0** | `python3 tools/verify_repository.py --archive artifacts/com.teyocesu.avatar-texture-studio-0.3.0.tgz` verifies unchanged imported inventory/metas/upstream test bodies, Editor-only identity/dependency scope, **68 unique asset GUIDs**, six stamp and five shader references, MIT attribution, harness setup and exact archive member/byte equivalence. No verifier allowlist/check was changed. |
+| **Automatically tested — executed, exit 0** | `python3 tools/package.py`, Python AST parsing and the complete exact-base Shot 3 whitespace check pass. The local UPM archive contains only the installable package, including Editor/Quality/Core, its UI and the shared explicit new-PNG helper. No compiler, private assets, test project or native dependency ships. |
+| **Inspected** | Reviewed the full Shot 3 delta and relevant stacked state/preview/recovery/export/capability/undo/install/license paths. All original painting/shader algorithms, PaintResources capability gates, SafeFileIO, PaintProjectIO, PaintSession, original test bodies and serialized MTPAINT1/2/ATSCRV01 formats remain unchanged on this branch. Source topology metadata is transient. No tests were removed/skipped, assertions relaxed, warnings suppressed, thresholds lowered to force PASS, checks disabled, fake GPU layer or placeholder workflow introduced. Cancellation catches retain labelled prior work; cleanup catches rethrow actual failures. |
+| **Inspected — inherited issue corrected on Shot 3 only** | TextureLab previously borrowed caller-owned baseline/result textures. Colorway refresh/disposal could destroy them and invalidate the comparison. The panel now validates inputs and takes independent owned copies, releases them on replacement/asset-picker change/disposal and never destroys imported assets. A targeted native regression destroys caller textures, checks retained panel pixels and verifies panel disposal. It is **authored but NOT TESTED** without Unity; this is source-confirmed lifetime coupling, not an executed native fix claim. |
+| **Simulated** | Existing filesystem regressions inject writer/native replacement-failure states into real files. They do not execute Unity Mono/Windows failures. Synthetic geometry/pixels execute the actual diagnostic CPU algorithms, not a simulated GPU. |
+| **Manually validated** | No native UI, physical input, GPU rendering or avatar workflow was manually validated. Source review is classified as inspected. |
+| **NOT TESTED** | Actual Unity API/package/shader compilation; both native suites; GPU readback/preview/export/import; skinning/edge overlays; IMGUI/input; undo/lifecycle/Play/reload/close; native Mono/Windows replacement; actual Unity-generated mipmaps and GPU compression; Poiyomi/lilToon and real-avatar-copy visuals; Windows/Metal resource/performance behavior. |
+| **Blocked** | Acceptance/release requires actual licensed Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11 execution, both suites and the consolidated observable QA flow in [WINDOWS_QA.md](WINDOWS_QA.md). The planned feature phases are implemented; missing physical gates remain release blockers. |
+
+## Implemented quality behavior and limits
+
+SeamDoctor retains source vertex/triangle/submesh/slot/channel identity and uses unique opposing exact-position edges plus indexed manifold connectivity. Disconnected UV islands can be real seams, but their adjacency cannot be established safely from coincidence alone; they stay uncertain/unmeasured. Cross-material/ambiguous-slot, duplicate/nonmanifold, deformed-apart, degenerate and unsupported UV/shader cases do not receive valid color metrics. This deliberately trades false negatives for explicit uncertainty.
+
+Matched samples use half-texel interior insets, one-texel exterior probes and diagnostic bilinear wrap-aware filtering. Oklab×100 is only for two visible colors; alpha and black/white-composite contrast remain separate. Raw data ignores transfer/premultiplication. Undefined/thin/imprecise results show N/A, not apparent zero continuity. Mean/max/count/worst-parameter values and a 0.05 contrast hint distinguish measured differences from potential concerns. Intentional hard transitions, alpha cutouts and ordinary exterior colors can produce concerns without a visual defect or insufficient padding.
+
+MipDoctor recursively generates deterministic CPU area-box levels, including NPOT footprints and premultiplied color/alpha with source transfer semantics. These are not actual Unity mip pixels, compressed-platform filters or VRChat appearance. Imported GPU mip-0 input may itself already include compression. Lower-resolution seam contrasts and exterior rings only suggest potential contamination. Source changes are not automatically reverified; results are frozen snapshots with recapture instructions and geometry/selection/Colorway staleness warnings. Diagnostics stay outside editable history/persistence. Existing editing/export paths remain linked in the same eight-workspace window; no readiness PASS or automatic repair/change is provided.
+
+Bounds: 250,000 whole-source triangles; 10,000 candidates; 256 samples/edge and one million/level; existing tile/fragment limits; 8192 per image axis; 14 levels / 384 MiB decoded CPU chain; 8 MiB report. Very large layouts/images and independent comparison copies can require substantial additional CPU/GPU memory; actual performance and allocation failure handling remain unmeasured. Pair counts/metrics are not a quality score or complete seam coverage guarantee.
+
+## Native integration authored, unexecuted
+
+StudioTests preserves every previous check and additionally calls QualityIntegrationTests: whole-source identity/material boundary handling; native mip-0 readback into labelled CPU levels without creating a creative document; preservation of painting layers/dirty/history; source image/meta/UV/material preservation; report unverified status; and independent TextureLab snapshot lifetime/release. Both StudioTests and the unchanged upstream MTPTests still require real execution. The Windows guide prioritizes compilation, both suites, painting/export, creative workflows, diagnostics, lifecycle/safety, disposable Poiyomi/lilToon and final real-avatar-copy visuals, with observable outcomes.
+
+## Unresolved inherited limitations
+
+- Custom shader correspondence remains unverified; standard geometric UV inspection cannot infer arbitrary sampling. Retained upstream GUIDs still prohibit co-installation with VRC Texture Painter.
+- Painting capability checks and algorithms remain source-inspected until native execution. The inherited pose hash checks the first 1024 bones; explicitly refresh/capture unusual rigs. GPU history/texture/memory ceilings and manual restart recovery remain documented. Painting/creative companion saves are independent transactions.
+- .NET 8/macOS filesystem success/fault injection does not establish Unity Mono/Windows durability. Native replacement recovery, physical input, lifecycle and proprietary-shader/avatar behavior remain untested, not silently resolved by Shot 3.
+
+## Final local package
+
+`artifacts/com.teyocesu.avatar-texture-studio-0.3.0.tgz` is an ignored local artifact: **182994 bytes**, SHA-256 **`fff3f854a1efb3428145c386cac679eacd09cd619b8452016e46ec359b6b6d78`**. Its exact source/member bytes were verified. It is not a Unity-tested installation or a release. See [architecture/metrics](ARCHITECTURE.md) and the canonical SPEC for contracts and primary API references.
+
+---
+
+# Shot 2 verification — 2026-11-10 (historical)
+
+The following record describes Shot 2 at its own delivery boundary. Its artifact/counts and next-phase restrictions are historical; all missing acceptance gates still apply to the complete product.
 
 **Implemented but not accepted.** Scope is `codex/shot-2-creative-studio` from exact Shot 1 base `9b1d2f0e43883079e5a3596a49832cbd0668b77e`. [Draft PR #2](https://github.com/Teyocesu/Avatar-Texture-Studio/pull/2), authored by Teyocesu, targets `codex/shot-1-painting-foundation`, never main. Shot 1 remains unaccepted. Git and the stacked PR record the final delivery head; this report does not claim actual Unity compilation or rendering.
 

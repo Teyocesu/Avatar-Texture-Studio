@@ -1,6 +1,38 @@
 # Avatar Texture Studio — Canonical specification
 
-Shot 2 below is the active contract. Shot 1 remains the foundation contract and is **implemented but not accepted**; this branch does not alter its acceptance status.
+Shot 3 below is the active contract. Shots 1 and 2 remain **implemented but not accepted**; no missing native acceptance gate is waived.
+
+## Shot 3 — Quality Studio
+
+### Delivery and integration
+
+Create `codex/shot-3-quality-studio` from exact Shot 2 commit `a5c90a471a8af9c75ead8cb366c891f6ef89738a`; draft PR targets `codex/shot-2-creative-studio`. Leave main/Shot 1/Shot 2 refs unchanged. No merge, tag, release or owner avatar project. Target remains Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11; native Unity/Windows/Metal acceptance stays NOT TESTED.
+
+Add SeamDoctor and MipDoctor within the same window, sharing target, UV navigation and TextureLab without changing paint sessions or editable documents. Diagnostics use explicit immutable snapshots: imported GPU mip-0 readback (possibly already platform-compressed), matching painting/mask composite, or the current Colorway result. Label provenance, transfer/data mode and snapshot staleness. No diagnostic warning automatically changes any image, mesh, importer, material or avatar. Existing `.mtpaint` and ATSCRV01 editability stays unchanged; diagnostic results are ephemeral and may be exported as a separate report.
+
+### Conservative seam correspondence
+
+Preserve source triangle, vertex-index, submesh/material-slot and UV-channel identity, source positions and posed world positions. Inspect whole-source topology within a 250,000-triangle ceiling, reusing CreativeMeshAdapter and UvGeometry. Do not weld or mutate source geometry. Group edges by exact source-position endpoints; approximate proximity is insufficient. A measurable pair requires exactly two nondegenerate incident edges, opposing geometric orientation, consistent source vertex data, coincident posed endpoints, the same indexed connected component, the same selected material slot/submesh and separated UV coordinates. Reject duplicate/nonmanifold, disconnected, inconsistent, deformed-apart or cross-material pairs explicitly. UV mirroring alone does not invalidate a pair.
+
+This is a topology-constrained candidate test, not proof of author intent. UV-split islands that are disconnected in source index topology cannot be distinguished reliably from unrelated coincident pieces and remain uncertain/unmeasured. Report those false negatives instead of inventing adjacency. Ordinary unsplit UV edges and open boundaries are counted separately. Respect existing UV tile/fragment limits; unsupported/degenerate mappings do not silently produce valid samples. Custom shader correspondence remains unverified.
+
+For validated candidates, compare matched edge parameters in the correct reversed orientation. Sample pixel-center-scale offsets into each triangle with documented wrap modes; unresolved thin/border samples remain counted as unmeasured. Bound samples to 256 per edge and one million per level, with cancellable analysis. Record per-edge counts, mean/worst values and worst parameter. Color metrics: Euclidean Oklab distance ×100 for two visible samples, absolute alpha difference, and maximum premultiplied/composited-on-black-or-white linear RGB difference. Both-transparent samples have no visible-color distance; hidden RGB is not labelled a visible defect. Data mode compares raw RGBA channels without sRGB decoding or premultiplication.
+
+Probe a one-texel exterior ring separately from interior samples. Normalized composite/raw-channel differences above 0.05 are labelled potential boundary contrast/padding risk, never confirmed errors or insufficient padding. A deliberate hard transition can be correct. Reports distinguish measured numbers, potential concerns, rejected/unsupported pairings and unverified native/shader behavior. Selected seam edges are visible in UV and Scene views. Export a bounded UTF-8 text report to a new filename using SafeFileIO; never replace a source image or existing report silently.
+
+### Deterministic CPU mip diagnostics
+
+Generate a recursive area-box chain through 1×1, with dimensions `max(1, floor(previous / 2))` and full-area integration for odd/NPOT dimensions. Color filtering decodes sRGB when appropriate, averages premultiplied linear RGB and alpha, unpremultiplies when alpha is nonzero and quantizes each level to RGBA8. Fully transparent output RGB is zero. Data filtering averages stored RGBA independently. Limits are 8192 per axis, at most 14 levels and 384 MiB of decoded chain pixels; construction is cancellable and never changes the source image.
+
+Display every level with color/raw/alpha inspection, source/reduced dimensions and explicit **CPU diagnostic** provenance. Compare base/selected levels through owned TextureLab snapshots; unequal dimensions retain its existing overlay restriction. Measure validated seams at selected reduced levels with the same metrics. Exterior-ring contrasts and increases at reduced resolution are potential bleeding indicators, not proof of Unity/VRChat appearance. CPU box filtering/quantization is not Unity's mip filter, actual imported mip data or GPU compression. Real Unity-generated mip and platform-compression comparisons remain NOT TESTED here.
+
+### Quality review, safety and completion
+
+A compact summary links UV inspection, existing editing, before/after comparison, seam/mip measurements, limitations and explicit export. Never show generic PASS/readiness for unverified rendering. Reuse the new-PNG export contract: new Assets filename, source transfer/alpha/dimensions/wrap, no assignment or source overwrite; only the explicitly exported new asset's importer may be configured. Diagnostics themselves remain read-only. Reject incompatible texture types/normal packing/HDR/virtual-only formats visibly.
+
+Keep quality snapshots/owned textures isolated from creative undo/persistence. Refresh invalidates stale geometry overlays; tab/lifecycle teardown releases owned textures and subscriptions. Failed/cancelled analysis retains the previous labelled snapshot/results and editable work. Preserve upstream arithmetic, capability gates, file safety, assertions, GUIDs and MIT notices. No universal seam repair, UV/mesh editing, automatic compression/material changes, new image editor, runtime components, services or publishing.
+
+Execute focused CPU regressions for known connected seams, reversal, disconnected coincidence, hard/continuous colors, mirrored UVs, slot/channel boundaries, alpha/color/data semantics, NPOT mip determinism/contamination, preservation, cancellation and limits. Preserve and run all existing available checks. Author proportionate native integration checks but leave them unexecuted without Unity. Consolidate Windows QA and review the stacked product for lifecycle, preview, persistence, ownership, installation, licensing and negative scope. Implementation of the planned product may finish; release/acceptance stays blocked until the real native gates pass.
 
 ## Shot 2 — Creative Studio
 

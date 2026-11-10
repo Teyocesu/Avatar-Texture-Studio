@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AvatarTextureStudio.Creative.Core;
+using AvatarTextureStudio.Quality.Core;
 using AvatarTextureStudio.Painting;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -15,6 +17,7 @@ namespace AvatarTextureStudio.Creative
         readonly PaintTarget pose;
         readonly N2 scale, offset;
         int poseHash;
+        Vector3[] worldPositions;
         public UvLayout Layout { get; private set; }
         public CreativeMeshAdapter(Renderer renderer, int slot, int channel, string property, N2 scale, N2 offset, TextureWrapMode u, TextureWrapMode v)
         {
@@ -42,21 +45,50 @@ namespace AvatarTextureStudio.Creative
                     skin.BakeMesh(baked, true); matrix = PaintTarget.ResolveBakeMatrix(skin, source, baked);
                 }
                 var positions = new List<Vector3>(); (baked != null ? baked : source).GetVertices(positions);
+                var rest = new List<Vector3>(); source.GetVertices(rest);
                 var indices = source.GetTriangles(submesh);
                 if (positions.Count != source.vertexCount) throw new InvalidOperationException("Baked/source vertex counts disagree; correspondence is unavailable.");
                 if (indices.Length / 3 > 250000) throw new InvalidOperationException("UV inspection is limited to 250,000 triangles per material slot; select a smaller source mesh.");
                 var triangles = new UvTriangle[indices.Length / 3];
+                var world = positions.Select(matrix.MultiplyPoint3x4).ToArray();
                 for (int i = 0; i < triangles.Length; i++)
                 {
                     int a = indices[i * 3], b = indices[i * 3 + 1], c = indices[i * 3 + 2];
                     triangles[i] = new UvTriangle { Id = i, Submesh = submesh, Slot = pose.Slots[0], Channel = pose.UVChannel,
-                        A = ToCore(matrix.MultiplyPoint3x4(positions[a])), B = ToCore(matrix.MultiplyPoint3x4(positions[b])), C = ToCore(matrix.MultiplyPoint3x4(positions[c])),
+                        A = ToCore(world[a]), B = ToCore(world[b]), C = ToCore(world[c]), IndexA = a, IndexB = b, IndexC = c,
+                        SourceA = ToCore(rest[a]), SourceB = ToCore(rest[b]), SourceC = ToCore(rest[c]),
                         U = ToCore(uvs[a]), V = ToCore(uvs[b]), W = ToCore(uvs[c]) };
                 }
                 Layout = new UvLayout(triangles, scale, offset, (UvWrap)pose.WrapU, (UvWrap)pose.WrapV);
+                worldPositions = world;
                 poseHash = hash; return true;
             }
             finally { if (baked != null) UnityEngine.Object.DestroyImmediate(baked); }
+        }
+        public UvTriangle[] CaptureTopology(Func<float, bool> cancel = null)
+        {
+            Refresh(true);
+            var source = PaintTarget.GetSourceMesh(pose.Renderer); var rest = new List<Vector3>(); source.GetVertices(rest);
+            var uv = new List<Vector2>(); source.GetUVs(pose.UVChannel, uv);
+            var result = new List<UvTriangle>(); int selectedSubmesh = PaintTarget.SubmeshForSlot(source, pose.Slots[0]);
+            int materialCount = pose.Renderer.sharedMaterials.Length;
+            for (int sub = 0; sub < source.subMeshCount; sub++)
+            {
+                if (source.GetTopology(sub) != MeshTopology.Triangles) continue;
+                if (result.Count + (long)source.GetIndexCount(sub) / 3 > SeamGeometry.MaxTriangles) throw new InvalidOperationException("Whole-source seam topology exceeds 250,000 triangles; use a smaller mesh.");
+                var slots = Enumerable.Range(0, materialCount).Where(s => PaintTarget.SubmeshForSlot(source, s) == sub).ToArray();
+                int slot = slots.Length == 1 ? slots[0] : -1;
+                var indices = source.GetTriangles(sub);
+                for (int i = 0; i < indices.Length / 3; i++)
+                {
+                    if ((i & 1023) == 0) SeamGeometry.CheckCancel(cancel, (sub + (float)i / Math.Max(1, indices.Length / 3)) / source.subMeshCount);
+                    int a = indices[i * 3], b = indices[i * 3 + 1], c = indices[i * 3 + 2];
+                    result.Add(new UvTriangle { Id = result.Count, Submesh = sub, Slot = slot, Channel = pose.UVChannel, IndexA = a, IndexB = b, IndexC = c,
+                        SourceA = ToCore(rest[a]), SourceB = ToCore(rest[b]), SourceC = ToCore(rest[c]), A = ToCore(worldPositions[a]), B = ToCore(worldPositions[b]), C = ToCore(worldPositions[c]),
+                        U = ToCore(uv[a]), V = ToCore(uv[b]), W = ToCore(uv[c]), UnsupportedForDiagnostics = sub == selectedSubmesh && Layout.Unsupported.Contains(i) });
+                }
+            }
+            return result.ToArray();
         }
         public static N2 ToCore(Vector2 v) => new N2(v.x, v.y);
         public static N3 ToCore(Vector3 v) => new N3(v.x, v.y, v.z);

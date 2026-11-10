@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using AvatarTextureStudio.TextureLab;
 using AvatarTextureStudio.Creative;
+using AvatarTextureStudio.Quality;
 
 namespace AvatarTextureStudio.Painting
 {
@@ -24,7 +25,7 @@ namespace AvatarTextureStudio.Painting
         static readonly PaintTool[] MaskTools = { PaintTool.HardBrush, PaintTool.SoftBrush, PaintTool.Blur, PaintTool.Eraser, PaintTool.Gradient, PaintTool.Stamp };
         static readonly string[] MaskToolNames = { "Hard", "Soft", "Blur", "Eraser", "Gradient", "Stamp" };
         static readonly string[] MaskChannelNames = { "R", "G", "B", "White", "Black" };
-        static readonly string[] TabNames = { "Painting", "Masks", "Compare", "UV Explorer", "Colorway", "Face Studio" };
+        static readonly string[] TabNames = { "Painting", "Masks", "Compare", "UV Explorer", "Colorway", "Face Studio", "SeamDoctor", "MipDoctor" };
         static readonly TextureWrapMode[] WrapOptions = { TextureWrapMode.Repeat, TextureWrapMode.Repeat, TextureWrapMode.Clamp, TextureWrapMode.Mirror, TextureWrapMode.MirrorOnce };
 
         [Serializable]
@@ -65,6 +66,7 @@ namespace AvatarTextureStudio.Painting
         [SerializeField] PainterTab maskTab = new PainterTab { mode = PaintMode.Mask };
         [SerializeField] TextureComparePanel comparison = new TextureComparePanel();
         [SerializeField] CreativeWorkspace creative = new CreativeWorkspace();
+        [SerializeField] QualityWorkspace quality = new QualityWorkspace();
 
         bool strokeFoldout = true;
         bool helpFoldout;
@@ -106,6 +108,7 @@ namespace AvatarTextureStudio.Painting
             tabIndex = Mathf.Clamp(tabIndex, 0, TabNames.Length - 1);
             if (comparison == null) comparison = new TextureComparePanel();
             if (creative == null) creative = new CreativeWorkspace();
+            if (quality == null) quality = new QualityWorkspace();
             creative.Initialize(SessionChanged, Repaint);
             if (tabIndex >= 3 && !EditorApplication.isPlayingOrWillChangePlaymode) creative.Enter();
             saveChangesMessage = "Save editable painting, mask and creative projects before closing Avatar Texture Studio?";
@@ -136,6 +139,7 @@ namespace AvatarTextureStudio.Painting
             if (thumbnailMaterial != null) DestroyImmediate(thumbnailMaterial);
             comparison?.Dispose();
             creative?.Dispose();
+            quality?.Dispose();
             PaintResources.Release();
         }
 
@@ -328,7 +332,7 @@ namespace AvatarTextureStudio.Painting
         {
             LoadSettings();
             var labels = TabNames.Select((name, i) => i < 2 && Tabs[i].session != null && i != tabIndex ? name + "  ●" : name).ToArray();
-            int selected = GUILayout.Toolbar(tabIndex, labels, GUILayout.Height(24));
+            int selected = GUILayout.SelectionGrid(tabIndex, labels, 4, EditorStyles.toolbarButton, GUILayout.Height(48));
             if (selected != tabIndex) SelectTab(selected);
 
             var tab = Tab;
@@ -338,6 +342,10 @@ namespace AvatarTextureStudio.Painting
             try
             {
                 if (tabIndex == 2) comparison.Draw(Repaint);
+                else if (tabIndex >= 6)
+                    quality.Draw(tabIndex == 7, creative, colorTab.session, maskTab.session,
+                        (before, after, data) => { comparison.SetPreviews(before, after, data, "CPU diagnostic mip comparison. Input may already contain compression. Actual Unity/VRChat mip filtering remains NOT TESTED."); SelectTab(2); GUIUtility.ExitGUI(); },
+                        index => { SelectTab(index); GUIUtility.ExitGUI(); });
                 else if (tabIndex >= 3)
                 {
                     creative.Draw(tabIndex, colorTab.session, color => { colorTab.settings.color = color; colorTab.settings.Save(); },

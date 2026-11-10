@@ -2,6 +2,17 @@
 
 Status: **NOT TESTED**. Record editor version, Windows build, GPU/driver, API, color space, package commit and observations with screenshots/logs. Do not mark a gate passed from source inspection or from this checklist's existence.
 
+## Consolidated order for the complete product
+
+1. Import the local 0.3.0 tarball in an empty project and open the isolated harness. Require actual package/API/shader compilation without errors before interaction. Retain GUID/co-installation restrictions; do not test in the owner's original avatar project.
+2. Execute both suites below on a real Direct3D 11 device. Require completion markers and inspect each failed observable behavior, not just test counts. Include ATSCREATIVE and ATSQUALITY integration lines.
+3. Exercise painting/mask strokes, layers/Undo, safe new export, explicit overwrite/assignment cancellation, source hashes and preview restoration.
+4. Exercise UV Explorer, Colorway and manual Face workflows, including ambiguous geometry, editable masks/parameters, color/alpha and independent TextureLab snapshots.
+5. Exercise SeamDoctor/MipDoctor against known synthetic geometry/pixels and the Shot 3 procedure below. Confirm measured/potential/unmeasured/unverified categories and CPU-vs-native distinctions.
+6. Save/reopen/reload/Play/close from every workspace, with domain reload on/off. Require editable state, dirty flags, source preservation and bounded resource cleanup, including failure/cancellation paths.
+7. In a separate disposable shader project, install legitimate Poiyomi/lilToon copies. Confirm ordinary painting works where supported and unverified/custom diagnostic mappings remain visibly unmeasured. Never bundle proprietary shaders or avatars in Git.
+8. Only after synthetic critical flows pass, inspect a backed-up real avatar copy at near/far camera distances. Record intentional seams, alpha edges, compressed/native mip differences, appearance, input and performance. Keep all untested hardware/shader cases explicit; separate Metal QA is still required.
+
 ## Prepare a separate project
 
 - Use licensed Unity **2022.3.22f1**, **Built-in**, **Linear**, **Direct3D 11**. Close other instances using the test project.
@@ -25,7 +36,7 @@ foreach ($method in $methods) {
   $arguments = "-batchmode -force-d3d11 -projectPath `"$project`" -executeMethod $method -logFile `"$log`""
   $process = Start-Process -FilePath $unity -ArgumentList $arguments -Wait -PassThru
   if ($process.ExitCode -ne 0) { throw "Suite failed: $method. Read $log" }
-  Select-String -Path $log -Pattern 'MTPTEST|ATSTEST|ATSCREATIVE|error CS|Shader error'
+  Select-String -Path $log -Pattern 'MTPTEST|ATSTEST|ATSCREATIVE|ATSQUALITY|error CS|Shader error'
 }
 ```
 
@@ -75,3 +86,16 @@ Acceptance stays blocked until compilation, GPU suites, the critical manual work
 - In Face Studio, manually create/name presets and reuse shared regions/navigation/sampling. Activate existing painting tools/layers on the matching target; a different open painting target must not be discarded. Region restrictions apply only to Colorway. Non-identity tiling/offset must block raw-UV Face painting with a clear reason. Compare baseline/current painting and baseline/Colorway in TextureLab; return to each workspace without losing state/history. No anatomy detection, mesh edits or runtime/avatar components may appear.
 
 Shot 2 and inherited Shot 1 acceptance remain blocked until these actual native gates pass. Do not start Shot 3 on an assumed pass.
+
+## Shot 3 diagnostics and product consistency — all NOT TESTED
+
+- StudioTests now also invokes QualityIntegrationTests. Require observable source vertex/submesh/slot preservation, no one-texture substitution at material boundaries, native mip-0 readback feeding labelled CPU levels, unchanged painting layers/dirty/history, source image/meta/mesh/material preservation, and report NOT TESTED status. Destroy caller previews after sending TextureLab snapshots: panel-owned pixels must stay alive until replacement/disposal, then be released. These native regressions are authored, not executed here.
+- Build a connected UV-split cylinder/strip with known paired edges and a reversed UV edge, plus unrelated spatially coincident disconnected pieces. Confirm only the supported topology-constrained pair receives measurements; disconnected/duplicate/nonmanifold/degenerate/cross-material/channel/UV-limit cases remain explicitly excluded. Source indices/UVs must stay unchanged. Test posed skinned seams and source/posed endpoints that separate after deformation.
+- Use constant, graded, deliberate hard-color, alpha-only, fully transparent hidden-color, sRGB, linear and raw shader-data fixtures. Compare sample count, orientation, mean/max Oklab/alpha/composite/raw values and worst parameter against known pixels. N/A must appear for undefined color or unresolved thin interiors. No deliberate hard transition should be called a confirmed defect.
+- Inspect cyan/magenta UV and model edges in raw and wrapped layouts. Test Repeat/Mirror negative tiles, Clamp/MirrorOnce exclusions and material transforms. Change selection/pose/mapping after capture: stale overlays must clear, frozen results stay labelled, and unsupported shaders/binding/wrap overrides must not acquire valid seam metrics. Ordinary diagnostic sampling is bilinear, not a claim about actual shader filtering.
+- Inspect CPU levels from an asymmetric NPOT image through 1×1, alpha inspection and TextureLab comparison. Verify 5→2→1 full-area integration, sRGB vs raw data, premultiplied alpha, zero-rounded-alpha RGB clearing, thin-detail loss and high-contrast mixing. Measure seams at reduced levels. Exterior-ring or increased contrast is a potential concern; actual Unity-generated/compressed mipmaps may differ and must be compared independently on the real device.
+- Cancel topology/mip/measurement work and exceed documented geometry/sample/memory/report limits. Previous labelled reports and all editable work remain intact; no partial results appear valid. Measure actual large-image latency, memory and GPU texture allocation failure handling. The original pose hash's first-1024-bone ceiling is inherited; explicitly refresh/capture after unusual high-bone-count poses.
+- Export a new diagnostic report and a new frozen-base PNG. Existing report/image/meta paths must be preserved; no warning may trigger export, compression/import changes, mesh edits or assignment automatically. Inspect source hashes, output transfer/alpha/size/wrap, report provenance/limits and distinction between base export and selected reduced preview. Raw data must remain raw; normal-packed/HDR/virtual-only unsupported cases must explain their limits.
+- Cycle all eight workspaces repeatedly with painting/mask/creative work open; test global Undo, before/after comparison, caller preview regeneration, lost focus, tab changes during drag and window resize. Recompile, Play/Edit and close/reopen with Save/Discard/Cancel. No duplicate Scene handlers, orphan property blocks/textures, lost editable adjustments or false snapshot freshness claims are allowed. Diagnostic reports are ephemeral; source edits/reimport require recapture.
+
+The planned implementation ends at Shot 3. Acceptance/release remains blocked until the ordered native procedure actually passes with attached evidence; no source review or CPU preview substitutes for it.

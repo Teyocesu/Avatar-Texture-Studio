@@ -1,6 +1,6 @@
 # Avatar Texture Studio — Creative Studio
 
-Editor-only painting, layers, per-channel masks, UV Explorer, editable region Colorways, manual Face Studio and TextureLab Compare. Target **Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11**. **Shots 1 and 2 are implemented but not accepted:** real Unity compilation, GPU interaction and Windows QA are pending. Version 0.2.0 is unreleased.
+Editor-only painting, layers, per-channel masks, UV Explorer, editable region Colorways, manual Face Studio, TextureLab, SeamDoctor and MipDoctor. Target **Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11**. **Shots 1–3 are implemented but not accepted:** real Unity compilation, GPU interaction and Windows QA are pending. Version 0.3.0 is unreleased.
 
 Install in an isolated empty 3D Built-in project first. Remove VRC Texture Painter: retained asset GUIDs prevent co-installation. Add this package's `package.json` through Package Manager > Add package from disk, or install its locally built `.tgz` through Add package from tarball.
 
@@ -23,5 +23,11 @@ Save editable `.atsstudio` files separately; related painting Save also writes `
 Face presets are manually named regions. Turn on **Paint with existing tools** to reuse the matching color painting session and its brushes/layers. Masks constrain Colorway; the original brush behavior remains unchanged. Identity material scale/offset is required for Face painting. Capture the composite explicitly to refresh a frozen Colorway baseline. Export Colorways only to a **new PNG** under Assets; its new importer preserves transfer/alpha/dimensions/wrap. Existing files and source assets are preserved, with no automatic material assignment.
 
 Painting derives from **VRC Texture Painter 1.2.0**, commit `29bbf3c728d55091190413066e549b0bbbb21bf6`, © 2026 ToffelsKater, MIT. See LICENSE.md, THIRD_PARTY_NOTICES.md and the historical `Documentation~/Upstream-README.md` for brush details. Follow Studio's current installation/export rules where the old manual differs.
+
+SeamDoctor and MipDoctor use explicit frozen imported/painting/mask/Colorway snapshots. Seam pairs require exact positional edges, unique opposing incidents, indexed connectivity, one material/submesh and consistent posed geometry. Disconnected/ambiguous islands remain unmeasured; some real seams are deliberately missed. Select a pair to inspect UV/3D edges and color/alpha/raw-channel measurements. Contrast/exterior-ring differences are potential concerns, never automatic defects or insufficient-padding verdicts.
+
+MipDoctor's recursive CPU area-box levels handle sRGB/linear color, premultiplied alpha, raw data and odd dimensions. Inspect alpha, measure seams at reduced levels and compare independent TextureLab snapshots. These are CPU diagnostics, **not actual Unity mipmaps, GPU compression or VRChat appearance**. Real rendering remains NOT TESTED. N/A marks unresolved/undefined measurements.
+
+Export a new bounded text report or the frozen base PNG. Existing new-PNG safety/transfer/alpha/size/wrap rules apply; no automatic assignment or source/importer changes follow a warning. Diagnostic state is temporary and isolated from editable projects. Recapture after edits/Undo/poses/reimport; source freshness is not reverified automatically. Limits: 250,000 source triangles, 10,000 pairs, 256 samples/edge and one million/level, 14 mip levels / 384 MiB CPU chain and 8 MiB reports. Native interaction, resource behavior and performance need physical QA.
 
 Full installation, workflow, verification and Windows QA: [Avatar Texture Studio](https://github.com/Teyocesu/Avatar-Texture-Studio).

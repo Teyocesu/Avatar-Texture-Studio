@@ -1,5 +1,15 @@
 # Changelog
 
+## Avatar Texture Studio 0.3.0 — Shot 3 (unreleased)
+
+- Add read-only SeamDoctor and MipDoctor in the existing window, sharing target/navigation and preserving painting, masks and creative projects.
+- Identify topology-constrained seam candidates with source vertex/submesh/slot/UV identity. Reject disconnected coincidence, ambiguous/nonmanifold edges, material boundaries and unsupported mappings explicitly.
+- Measure matched color/alpha/raw-channel differences and exterior-ring contrast as potential concerns, not automatic defects. Export bounded diagnostic reports to new filenames.
+- Generate deterministic CPU area-box mip chains with sRGB/linear, premultiplied alpha, raw-data and NPOT semantics; distinguish them from actual Unity mips/compression. Inspect alpha and compare through TextureLab.
+- Reuse the existing new-PNG contract; diagnostic warnings never alter source assets, importers or materials. Preserve MTPAINT1/2 and ATSCRV01 editability.
+- Fix inherited TextureLab snapshot lifetime coupling with independent owned copies; add an unexecuted native regression. Fix sparse-alpha CPU mip quantization with a failing-then-passing CPU test.
+- Run available CPU/file/syntax/package/provenance checks. All actual Unity/GPU/Windows/Metal acceptance remains NOT TESTED; no release is published.
+
 ## Avatar Texture Studio 0.2.0 — Shot 2 (unreleased)
 
 - Add UV Explorer with source UV0–UV7, material-slot geometry, posed surface correspondence, wrap-aware reverse lookup, explicit ambiguity choice and shared navigation.

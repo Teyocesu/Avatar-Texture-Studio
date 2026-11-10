@@ -1,4 +1,13 @@
-# Shot 2 execution plan
+# Shot 3 execution plan
+
+Active contract: Shot 3 in SPEC.md. Branch `codex/shot-3-quality-studio`, exact base `a5c90a471a8af9c75ead8cb366c891f6ef89738a`; draft targets Shot 2. Earlier branches stay unchanged and unaccepted.
+
+1. **Context/contract — complete.** Read canonical docs and provenance; fix conservative seam confidence, metrics, CPU mip semantics, read-only snapshots and resource ceilings before implementation. Native Unity/license/Windows remain unavailable.
+2. **Pure diagnostics — implemented.** Source-index/topology confidence, alpha/color/data sampling, CPU area-box mips and bounded text reports pass executable CPU fixtures. Sparse-alpha quantization exposed a failing regression; fully transparent color outputs now clear RGB and the same test passes. Existing tests remain intact.
+3. **Integrated quality workspaces — implemented.** Shared inspection/navigation, seam UV/Scene overlays, CPU mip/alpha inspection, TextureLab snapshots, quality summary and explicit new-file/report export are integrated. Native source-preservation/session/snapshot-lifetime checks are authored but unexecuted.
+4. **Product review and delivery — complete.** Reviewed the exact-base delta and stacked lifecycle/safety/compatibility paths; docs, consolidated Windows QA, evidence/HANDOFF and all available checks/package verification are complete. Source-confirmed inherited TextureLab lifetime coupling is corrected on this branch only; its native regression remains NOT TESTED. Committed/pushed as Teyocesu; [draft PR #3](https://github.com/Teyocesu/Avatar-Texture-Studio/pull/3) targets Shot 2 at the exact requested base. Planned implementation is complete; acceptance/release remains blocked on real native gates. No merge/tag/release.
+
+## Shot 2 historical execution
 
 Active contract: Shot 2 in SPEC.md. Branch `codex/shot-2-creative-studio`, exact base `9b1d2f0e43883079e5a3596a49832cbd0668b77e`; stacked draft PR targets Shot 1's branch. Shot 1 remains unaccepted and its branch is unchanged.
 

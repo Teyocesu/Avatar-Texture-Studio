@@ -77,6 +77,7 @@ internal static class Program
                 "replacement error identifies both recovery files");
 
             CreativeCoreTests.Run();
+            QualityCoreTests.Run();
 
             string root = args.Length == 0 ? Directory.GetCurrentDirectory() : args[0];
             var sources = Directory.EnumerateFiles(Path.Combine(root, "Packages"), "*.cs", SearchOption.AllDirectories)
