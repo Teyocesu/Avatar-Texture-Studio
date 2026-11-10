@@ -1,0 +1,371 @@
+{
+  "repository": "https://github.com/ToffelsKater/VRC-Texture-Painter",
+  "commit": "29bbf3c728d55091190413066e549b0bbbb21bf6",
+  "files": [
+    {
+      "source": "Packages/com.vrctexturepainter.tool/CHANGELOG.md",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/CHANGELOG.md",
+      "sha256": "626eb077aaad02a4973db3858a335ce26010cc8e60fe465a4a4119ec111f97ad"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/CHANGELOG.md.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/CHANGELOG.md.meta",
+      "sha256": "b8d64192fa312b9a0ff5235bf6ab3456f3917672f5b6ab11585790b3db696393"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/AssemblyInfo.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/AssemblyInfo.cs",
+      "sha256": "892fac6b55f23772c3afeb1cf4384a6453211c526d0c1a446bcac6e36222bd30"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/AssemblyInfo.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/AssemblyInfo.cs.meta",
+      "sha256": "37621d69fff365fbf87a4d76ebfb15f50aed9773efba261ff6517a7089cbd052"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/BrushEngine.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/BrushEngine.cs",
+      "sha256": "07e9f3224311e101d531108520cf422cccb16f41c1a1d034327257efce0cf264"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/BrushEngine.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/BrushEngine.cs.meta",
+      "sha256": "34b2568bce6fd28efcd1c47da7bd361f1f1655a1bbc1b6de6946f75fa5a9f62d"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/BrushSettings.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/BrushSettings.cs",
+      "sha256": "4ac16f821b1ab1ef54312d7de91b4b27edbe4e5773c0e5af86785d45eb680056"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/BrushSettings.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/BrushSettings.cs.meta",
+      "sha256": "8b599a81efb4210055cf93d27f3f4ebf9f805a60e846fd172b55d1a5832c3792"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintDocument.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintDocument.cs",
+      "sha256": "1dfc2b0a0ef4cdc8bc0aa232167e3ef5a6a47d2cbd76945020558673d71af49e"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintDocument.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintDocument.cs.meta",
+      "sha256": "2de35d59fa73798445b149e3071e2056fd31ade0556725a5422b5aa4d580da71"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintHistory.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintHistory.cs",
+      "sha256": "0ff51435490d466c8fa3b7a244a807ca54953bf6fbc68aa1d1598e4ffae92a18"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintHistory.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintHistory.cs.meta",
+      "sha256": "0ed76d066c8aa3e35ffc749bb042356026e4ec4449221114cfd94719d86cd696"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintLayer.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintLayer.cs",
+      "sha256": "f528e40b0225cc81b2da891d4b88dd841c68245df528d534800bd3b473eb33db"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintLayer.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintLayer.cs.meta",
+      "sha256": "e61ae9b5d084833e158b75bbf94aa4ee8e6d48971775da155f4ad0d3adb3181a"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintProjectIO.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintProjectIO.cs",
+      "sha256": "29aaf95abbf311c126bb3209086eac51a0c889d463e35fc14691149cf85d58c7"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintProjectIO.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintProjectIO.cs.meta",
+      "sha256": "6b102368f849bf600ba11e57735b28c9aeedd9cfd172550bdeb0e5687a5ff514"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintResources.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintResources.cs",
+      "sha256": "9b1586842013452a7269c23167133f67dddc0ce596e7a63d5bf6b6048faf3c33"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintResources.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintResources.cs.meta",
+      "sha256": "dd19d68943425b0aeb1c6d69262509b6ee1a277ed025b108a165b6c235e96165"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintSession.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintSession.cs",
+      "sha256": "405fce27d8c1edfc52e1dde7715f506e757a767ced8bbec5a264b1622f3ec242"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintSession.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintSession.cs.meta",
+      "sha256": "f9d02031e90338f4b8cea096215b2955609aedadd90170479dec84de440ee40e"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintTarget.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintTarget.cs",
+      "sha256": "2a514c3052967accb37ee4ac930a2995c2306e4ac50df687cfc1d814d6624cd3"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintTarget.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintTarget.cs.meta",
+      "sha256": "6a29979f09ac173ed1884ae77bed73a92317c3223aa0e0b2c1bddd0492d24d18"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintUndoProxy.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintUndoProxy.cs",
+      "sha256": "b2ebe0619fef8546ddac42fb9876c46f462e1c8b4a8a8de029a86c53d11cf20f"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/PaintUndoProxy.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/PaintUndoProxy.cs.meta",
+      "sha256": "ef0882f2147f01aaf3347d9f3b14a755f0fecef04384ac438dfcddcd2a5069df"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/TriangleBVH.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/TriangleBVH.cs",
+      "sha256": "73302497c1aac8aa7b3cd3c11b52b61269f9b3a61ec7ba3746223f3e99998636"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core/TriangleBVH.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core/TriangleBVH.cs.meta",
+      "sha256": "97cfcc5925f86cba9af9e7389d4b71b1f7c8cfb1369709d6fbeb23bfa522c9af"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Core.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Core.meta",
+      "sha256": "c570c426d8e7118f95acea0386948a79c3498dadbc6f719472649956a561fabe"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/MeshTexturePainter.Editor.asmdef",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/AvatarTextureStudio.Editor.asmdef",
+      "sha256": "119c22b63af6c691a9a45413cc5c62b6757d2d12e55a7caabe0de857cd057b94"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/MeshTexturePainter.Editor.asmdef.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/AvatarTextureStudio.Editor.asmdef.meta",
+      "sha256": "4601fc30b4301d338c470bea7d094839beac2ff74c733f900368380384bb49cd"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTPColor.cginc",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTPColor.cginc",
+      "sha256": "e9077457f37faeec0798d53cc561f777779338e1f120ba14f0b8f2a1eea91edc"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTPColor.cginc.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTPColor.cginc.meta",
+      "sha256": "91d8333f3fe49785765cffa7c5e692bd6ad57da156482ee3550c30704f22b759"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTPCommon.cginc",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTPCommon.cginc",
+      "sha256": "6fe083ebc9e3cde005e1afef64273ce02f5f15d24745b73c22e0a770189ad167"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTPCommon.cginc.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTPCommon.cginc.meta",
+      "sha256": "92420c1851cabf5875b59b323c5b12f385be6affea53890cc24e051ba7e28328"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTPWrap.cginc",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTPWrap.cginc",
+      "sha256": "d689d726f150ceef0ad7adccf2a9f66e754232b745296fce3081bf0314f0f856"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTPWrap.cginc.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTPWrap.cginc.meta",
+      "sha256": "6f01846dedf39146f3ef2b7749f74c69d9a9aedc67877ebaf185c8bff5f7812f"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_Blit.shader",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_Blit.shader",
+      "sha256": "6d5e21bd5b20ae824caf5aa76caef3324f917f4929bdf8fb1144b2f117617beb"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_Blit.shader.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_Blit.shader.meta",
+      "sha256": "9515ec4acceff672c6ebb9a60ad5572f5b22c3c8147a794c3c61f299b27263b6"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_GUI.shader",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_GUI.shader",
+      "sha256": "cedb37b1793ab63b9770e34ba461fa254ae9c6159d47e96601ad4c72c853b7a5"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_GUI.shader.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_GUI.shader.meta",
+      "sha256": "58322d5ddc4cc09c8770eb09c3c3a1e0ed4ea6cda87f0f7d7b4c2a595734b18f"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_UVSpace.shader",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_UVSpace.shader",
+      "sha256": "d4d3ed4125ae30448dbf81539b425319463e5647238e30153c9e40e1dd6445fd"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_UVSpace.shader.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_UVSpace.shader.meta",
+      "sha256": "11195d115cb6a241548dd9583e75c84ad9c4bd02e45f76a30e00052e96cce53b"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_ViewSpace.shader",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_ViewSpace.shader",
+      "sha256": "ec1a306cfcd145ef7da244a5d570ac1d8ee27acad1afe18513ce7529088a4fdf"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders/MTP_ViewSpace.shader.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders/MTP_ViewSpace.shader.meta",
+      "sha256": "c5566de4d8048fe784dd2a7ddea3511e46221a03ba46eb96cfe6b7fb20574912"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/Shaders.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/Shaders.meta",
+      "sha256": "c151d9136ef621594bd88b80a15cddfff40d2963a94d16c44c7770ef39e85e3c"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/UI/MeshTexturePainterWindow.cs",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/UI/MeshTexturePainterWindow.cs",
+      "sha256": "8753bb52311748e069c091f4dd4f4b79bbb3b4ced8025b1a68c6050060d43964"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/UI/MeshTexturePainterWindow.cs.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/UI/MeshTexturePainterWindow.cs.meta",
+      "sha256": "eeb34ceee13577774cc825a7de71e375b19cfe7c94234dade4126e54ed0e3b34"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor/UI.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor/UI.meta",
+      "sha256": "ffdc9b0fdddd190552a90fbe71bc216d2a5817801a002adc45e22dc6b7d6ed51"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Editor.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Editor.meta",
+      "sha256": "f4e87ad9cea5f89ccd062b0ff192f530e7a9d8a9b1f48d7f79d2e85a84a46975"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/LICENSE.md",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/LICENSE.md",
+      "sha256": "8bacece86ec750494f89e7426334ca2085757823f7d1717c73e7d4b1a6449297"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/LICENSE.md.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/LICENSE.md.meta",
+      "sha256": "27cc5e1d271370405f81edf4cbbc2b7d38601a73cd35ce0a254b3e2d819d34b9"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/README.md",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/README.md",
+      "sha256": "42a52e3cfe13bf84739b976089729d5179c661539269f8f13155a7eee049909b"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/README.md.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/README.md.meta",
+      "sha256": "a3c081c397f78018c0eb8c345c5a503ac54034646e921c4720b496dcaebd2544"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Flower.png",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Flower.png",
+      "sha256": "755007ca1b91ad44233cbf57e893f26c7bcc7e07490fc58690779d4714e2d7ba"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Flower.png.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Flower.png.meta",
+      "sha256": "9f9c9264d99681560d28f77a83dc0b82f2560773ec103cca431d90b1a20f3263"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Heart.png",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Heart.png",
+      "sha256": "e302b6ebe733b84f6e89e9096924d394f148090bf183ca4feb3035cc0d3eeb6b"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Heart.png.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Heart.png.meta",
+      "sha256": "7732b14cea3e1b35f65fe98422e2263ca01b40a0b76ffa558b324bb4e99e00ca"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Moon.png",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Moon.png",
+      "sha256": "d1aaf7fb57e877716bee82ebabe7f0a629820ebaa4e181505ebd964eadeadc99"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Moon.png.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Moon.png.meta",
+      "sha256": "030794249a91ae1be63672f5ff56c2674b1a6157b5d2755cd33b7d80cc2efb2f"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Paw.png",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Paw.png",
+      "sha256": "a5c3c4beaf807ae454c0a652e5b95e222a5dd9b3ec17e0d327ecc9b95f217eeb"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Paw.png.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Paw.png.meta",
+      "sha256": "ac52db516c54c8cd7f8120c7fece0307c3f083cbc28edb59ae6d3e4f12f55fd6"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Sparkle.png",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Sparkle.png",
+      "sha256": "9da924fe5627cd5b5ee383555dfbe9bdc27f464bf4bedead1db5af781ec9876d"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Sparkle.png.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Sparkle.png.meta",
+      "sha256": "d0d08ae59cf9840fee16d344df8b58aeae614ba4f08aef28270bfa559b4d5056"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Star.png",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Star.png",
+      "sha256": "8b7d7a1578be3b06e7cb046dc3e756dc606e081d443dd978341c98dd82ccfc52"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps/Star.png.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps/Star.png.meta",
+      "sha256": "0cd25d1b8da7d8c79b4ce577ff1f4ab5a794a927e3cbf75f7a570757b154ed67"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/Stamps.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/Stamps.meta",
+      "sha256": "83ba11ea8bf876f2cecb9aa7fbe4f03f417a328e4b411d517cc99b00367ecad3"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/package.json",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/package.json",
+      "sha256": "c191cb82ea4a7cd7db24ee905fd724e1fd6b0fc800c6aededf04fc6f206ac613"
+    },
+    {
+      "source": "Packages/com.vrctexturepainter.tool/package.json.meta",
+      "destination": "Packages/com.teyocesu.avatar-texture-studio/package.json.meta",
+      "sha256": "0a5ba9decc91480fb84da14b2fb409758792a60a1964d258f84a557cc7cfe07c"
+    },
+    {
+      "source": "Assets/MeshTexturePainterTests/Editor/MTPTests.cs",
+      "destination": "Tests/UnityProject/Assets/MeshTexturePainterTests/Editor/MTPTests.cs",
+      "sha256": "ee83837f0b44dac59fd44e8c399236f9cd84c9a2daf0601bdb4f94b121b13819"
+    },
+    {
+      "source": "Assets/MeshTexturePainterTests/Editor/MTPTests.cs.meta",
+      "destination": "Tests/UnityProject/Assets/MeshTexturePainterTests/Editor/MTPTests.cs.meta",
+      "sha256": "6e65e7b180e0b6047ff02990310ab5c8906de4bc0973641b2c375477d949bce0"
+    },
+    {
+      "source": "Assets/MeshTexturePainterTests/Editor/MeshTexturePainter.Tests.asmdef",
+      "destination": "Tests/UnityProject/Assets/MeshTexturePainterTests/Editor/MeshTexturePainter.Tests.asmdef",
+      "sha256": "06c012d77b10416d65ec4df1b16461241a187df97b94e814482be9188fe3944f"
+    },
+    {
+      "source": "Assets/MeshTexturePainterTests/Editor/MeshTexturePainter.Tests.asmdef.meta",
+      "destination": "Tests/UnityProject/Assets/MeshTexturePainterTests/Editor/MeshTexturePainter.Tests.asmdef.meta",
+      "sha256": "99d575c383405c84bc3f575a9ea584d449e66c8bbc6594e30ea929ef51399a27"
+    },
+    {
+      "source": "Assets/MeshTexturePainterTests/Editor.meta",
+      "destination": "Tests/UnityProject/Assets/MeshTexturePainterTests/Editor.meta",
+      "sha256": "e259916a2e6fa149493e8a75673b9edbd4f01ea4215f93fb86565b55dd441590"
+    },
+    {
+      "source": "Assets/MeshTexturePainterTests.meta",
+      "destination": "Tests/UnityProject/Assets/MeshTexturePainterTests.meta",
+      "sha256": "53e0ebd1cdadf87382aa727c6a013b10291f7a648b27f741f1d5dce58b058f69"
+    }
+  ]
+}

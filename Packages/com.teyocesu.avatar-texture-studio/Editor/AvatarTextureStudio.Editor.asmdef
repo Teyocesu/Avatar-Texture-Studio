@@ -1,0 +1,16 @@
+{
+    "name": "AvatarTextureStudio.Editor",
+    "rootNamespace": "AvatarTextureStudio",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

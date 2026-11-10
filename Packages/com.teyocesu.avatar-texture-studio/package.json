@@ -1,0 +1,26 @@
+{
+  "name": "com.teyocesu.avatar-texture-studio",
+  "displayName": "Avatar Texture Studio",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Editor-only avatar texture painting, layers, shader masks, editable projects, safe PNG export and read-only TextureLab comparison. Derived from MIT VRC Texture Painter.",
+  "author": {
+    "name": "Teyocesu",
+    "url": "https://github.com/Teyocesu"
+  },
+  "license": "MIT",
+  "documentationUrl": "https://github.com/Teyocesu/Avatar-Texture-Studio#readme",
+  "changelogUrl": "https://github.com/Teyocesu/Avatar-Texture-Studio/blob/main/Packages/com.teyocesu.avatar-texture-studio/CHANGELOG.md",
+  "licensesUrl": "https://github.com/Teyocesu/Avatar-Texture-Studio/blob/main/THIRD_PARTY_NOTICES.md",
+  "keywords": [
+    "vrchat",
+    "avatar",
+    "texture",
+    "paint",
+    "layers",
+    "poiyomi",
+    "liltoon",
+    "mask",
+    "editor"
+  ]
+}
