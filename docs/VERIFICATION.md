@@ -1,6 +1,6 @@
 # Shot 2 verification — 2026-11-10
 
-**Implemented but not accepted.** Scope is `codex/shot-2-creative-studio` from exact Shot 1 base `9b1d2f0e43883079e5a3596a49832cbd0668b77e`. The new draft targets `codex/shot-1-painting-foundation`, never main. Shot 1 remains unaccepted. Git and the stacked PR record the final delivery head; this report does not claim actual Unity compilation or rendering.
+**Implemented but not accepted.** Scope is `codex/shot-2-creative-studio` from exact Shot 1 base `9b1d2f0e43883079e5a3596a49832cbd0668b77e`. [Draft PR #2](https://github.com/Teyocesu/Avatar-Texture-Studio/pull/2), authored by Teyocesu, targets `codex/shot-1-painting-foundation`, never main. Shot 1 remains unaccepted. Git and the stacked PR record the final delivery head; this report does not claim actual Unity compilation or rendering.
 
 ## Executed environment and checks
 
