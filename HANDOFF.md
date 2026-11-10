@@ -1,6 +1,6 @@
 # Shot 1 handoff
 
-Shot 1 is implemented but not accepted on `codex/shot-1-painting-foundation`, based on `12bf05d397c46dbab7a12f438cf0878d217b52a9`. Follow SPEC.md and PLAN.md. Final commit/push/draft PR delivery is the remaining task before handoff.
+Shot 1 is **implemented but not accepted** on `codex/shot-1-painting-foundation`, based on `12bf05d397c46dbab7a12f438cf0878d217b52a9`. [Draft PR #1](https://github.com/Teyocesu/Avatar-Texture-Studio/pull/1) is open against main under Teyocesu. Follow SPEC.md and PLAN.md. Use Git/PR for the final head; do not merge or release before real acceptance.
 
 Upstream is pinned to `29bbf3c728d55091190413066e549b0bbbb21bf6` (1.2.0); see docs/UPSTREAM.md and THIRD_PARTY_NOTICES.md. All original metas/GUIDs remain; do not co-install with upstream. Painting/masks retain the engine; Compare is independent in the same window. Export assignment defaults off; overwrite/assignment is explicit. Project files retain MTPAINT1/2 within documented bounds.
 
