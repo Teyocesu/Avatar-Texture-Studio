@@ -1,6 +1,6 @@
 # Shot 3 verification — 2026-11-10
 
-**Planned implementation complete; NOT ACCEPTED.** Scope is `codex/shot-3-quality-studio` from exact Shot 2 commit `a5c90a471a8af9c75ead8cb366c891f6ef89738a`. The stacked draft targets `codex/shot-2-creative-studio`. Main and earlier feature branches remain unchanged. This final planned implementation phase does not waive any Shot 1/2 native acceptance gate or authorize a release. Git/PR records the delivery head.
+**Planned implementation complete; NOT ACCEPTED.** Scope is `codex/shot-3-quality-studio` from exact Shot 2 commit `a5c90a471a8af9c75ead8cb366c891f6ef89738a`. [Draft PR #3](https://github.com/Teyocesu/Avatar-Texture-Studio/pull/3), authored by Teyocesu, targets `codex/shot-2-creative-studio`. Main and earlier feature branches remain unchanged. This final planned implementation phase does not waive any Shot 1/2 native acceptance gate or authorize a release. Git/PR records the delivery head.
 
 ## Current executed evidence
 
