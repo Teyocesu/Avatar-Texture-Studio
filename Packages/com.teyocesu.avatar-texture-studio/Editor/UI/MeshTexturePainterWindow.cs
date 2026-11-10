@@ -336,9 +336,11 @@ namespace AvatarTextureStudio.Painting
             if (selected != tabIndex) SelectTab(selected);
 
             var tab = Tab;
-            if (tabIndex == 2) compareScroll = EditorGUILayout.BeginScrollView(compareScroll);
-            else if (tabIndex >= 3) creativeScroll = EditorGUILayout.BeginScrollView(creativeScroll);
-            else tab.scroll = EditorGUILayout.BeginScrollView(tab.scroll);
+            // Native scopes avoid ending layout groups while Unity is exiting an IMGUI event (for example Undo).
+            using var scroll = new EditorGUILayout.ScrollViewScope(tabIndex == 2 ? compareScroll : tabIndex >= 3 ? creativeScroll : tab.scroll);
+            if (tabIndex == 2) compareScroll = scroll.scrollPosition;
+            else if (tabIndex >= 3) creativeScroll = scroll.scrollPosition;
+            else tab.scroll = scroll.scrollPosition;
             try
             {
                 if (tabIndex == 2) comparison.Draw(Repaint);
@@ -368,10 +370,6 @@ namespace AvatarTextureStudio.Painting
             {
                 lastError = e.Message;
                 Debug.LogException(e);
-            }
-            finally
-            {
-                EditorGUILayout.EndScrollView();
             }
         }
 
@@ -1062,9 +1060,9 @@ namespace AvatarTextureStudio.Painting
             {
                 var history = session.History;
                 using (new EditorGUI.DisabledScope(!history.CanUndo))
-                    if (GUILayout.Button(history.CanUndo ? $"Undo {history.UndoName}" : "Undo")) history.PerformUndo();
+                    if (GUILayout.Button(history.CanUndo ? $"Undo {history.UndoName}" : "Undo")) { history.PerformUndo(); GUIUtility.ExitGUI(); }
                 using (new EditorGUI.DisabledScope(!history.CanRedo))
-                    if (GUILayout.Button(history.CanRedo ? $"Redo {history.RedoName}" : "Redo")) history.PerformRedo();
+                    if (GUILayout.Button(history.CanRedo ? $"Redo {history.RedoName}" : "Redo")) { history.PerformRedo(); GUIUtility.ExitGUI(); }
             }
         }
 

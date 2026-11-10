@@ -1,4 +1,13 @@
-# Shot 3 execution plan
+# Windows acceptance and stabilization
+
+Active work: validate the complete SPEC in isolated projects from exact Shot 3 HEAD `2840cd15d5a70a4d4403341166aeb81f8fd692ba`. Stabilization branch: `codex/windows-acceptance-stabilization`, draft target `codex/shot-3-quality-studio`. No feature phase, owner avatar project, merge, tag or release.
+
+1. **Native integration — executed.** Unity 2022.3.22f1 / Windows 11 / Built-in / Linear / DX11 on RTX 4050. Reproduced and corrected compilation, RGB24 admission and window-fixture failures. Both preserved suites complete successfully in the local harness and a clean tarball project.
+2. **Critical flows — partial.** Native suite checks and real UI painting/session/layer/history/save/reload/Play/mip/Compare interactions executed. UI Undo/Redo exposed an IMGUI layout defect; the focused interaction passes after correction. Full connected creative/Face and all-tab lifecycle/visual coverage remains pending.
+3. **Evidence and review — recorded.** See the current record in docs/VERIFICATION.md, the owner procedure in docs/WINDOWS_QA.md and the desktop task outputs for logs, screenshots and hashes. Preserve failed attempts. Full FileSafety is blocked by Windows symlink privilege; the unchanged Creative/Quality CPU subset passes separately.
+4. **Owner acceptance — pending, NO-GO.** Complete the remaining manual matrix, legitimate disposable shader project and backed-up avatar-copy visuals; separately test Metal. No completion or release is implied by native suite success.
+
+## Shot 3 historical execution plan
 
 Active contract: Shot 3 in SPEC.md. Branch `codex/shot-3-quality-studio`, exact base `a5c90a471a8af9c75ead8cb366c891f6ef89738a`; draft targets Shot 2. Earlier branches stay unchanged and unaccepted.
 

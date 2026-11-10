@@ -26,11 +26,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path)
     args = parser.parse_args()
-    package = json.loads((PACKAGE / "package.json").read_text())
+    package = json.loads((PACKAGE / "package.json").read_text(encoding="utf-8"))
     check(package["name"] == PACKAGE.name and package["unity"] == "2022.3"
           and package["license"] == "MIT" and not package.get("dependencies"), "UPM identity, Unity target and dependency scope")
     for path in [*PACKAGE.rglob("*.asmdef"), *ASSETS.rglob("*.asmdef")]:
-        data = json.loads(path.read_text())
+        data = json.loads(path.read_text(encoding="utf-8"))
         check(data["includePlatforms"] == ["Editor"], f"editor-only assembly {data['name']}")
     check(all("Editor" in p.relative_to(PACKAGE).parts for p in PACKAGE.rglob("*.cs")), "no runtime scripts in package")
 
@@ -43,7 +43,7 @@ def main():
             if path.suffix == ".meta":
                 if not path.with_suffix("").exists():
                     raise RuntimeError("Orphan meta: " + str(path.relative_to(ROOT)))
-                match = re.search(r"^guid: ([0-9a-f]{32})$", path.read_text(), re.M)
+                match = re.search(r"^guid: ([0-9a-f]{32})$", path.read_text(encoding="utf-8"), re.M)
                 if not match or match[1] in guids:
                     raise RuntimeError("Missing or duplicate GUID: " + str(path))
                 guids[match[1]] = path
@@ -51,22 +51,22 @@ def main():
             elif not Path(str(path) + ".meta").exists():
                 raise RuntimeError("Missing meta: " + str(path))
     check(meta_count > 0, f"all asset metadata present with {meta_count} unique GUIDs")
-    settings = (PACKAGE / "Editor/Core/BrushSettings.cs").read_text()
+    settings = (PACKAGE / "Editor/Core/BrushSettings.cs").read_text(encoding="utf-8")
     stamp_guids = re.findall(r'"([0-9a-f]{32})"', settings)
     check(len(stamp_guids) == 6 and all(g in guids and guids[g].parent.name == "Stamps" for g in stamp_guids), "six default brush-tip GUID references resolve")
 
     sources = list((PACKAGE / "Editor").rglob("*.cs"))
-    code = "\n".join(p.read_text() for p in sources)
+    code = "\n".join(p.read_text(encoding="utf-8") for p in sources)
     shader_names = set()
     for path in PACKAGE.rglob("*.shader"):
-        shader_names.update(re.findall(r'Shader\s+"([^"]+)"', path.read_text()))
+        shader_names.update(re.findall(r'Shader\s+"([^"]+)"', path.read_text(encoding="utf-8")))
     lookups = set(re.findall(r'"(Hidden/AvatarTextureStudio/[^"\s]+)"', code))
     check(lookups == shader_names and len(lookups) == 5, "all five branded shader lookups match assets")
     check("namespace MeshTexturePainter" not in code and "Hidden/MeshTexturePainter/" not in code,
           "painting namespace and shader identity isolated")
     check('[MenuItem("Tools/Avatar Texture Studio")]' in code, "requested Tools menu entry")
 
-    inventory = json.loads((ROOT / "docs/upstream-files.json").read_text())
+    inventory = json.loads((ROOT / "docs/upstream-files.json").read_text(encoding="utf-8"))
     check(inventory["commit"] == "29bbf3c728d55091190413066e549b0bbbb21bf6", "exact upstream pin recorded")
     adapted = {
         "Editor/Core/BrushEngine.cs", "Editor/Core/BrushSettings.cs", "Editor/Core/PaintProjectIO.cs",
@@ -88,7 +88,7 @@ def main():
             expected = entry["sha256"]
         elif ASSETS in path.parents and path.suffix == ".asmdef":
             continue
-        elif str(path.relative_to(PACKAGE)) in adapted:
+        elif path.relative_to(PACKAGE).as_posix() in adapted:
             continue
         else:
             if path.suffix in (".cs", ".shader"):
@@ -103,19 +103,19 @@ def main():
     check(retained > 0, f"{retained} upstream files preserve bytes or declared identity-only transformations; no imported files missing")
     readme_entry = next(e for e in inventory["files"] if e["source"] == "Packages/com.vrctexturepainter.tool/README.md")
     check(sha((PACKAGE / "Documentation~/Upstream-README.md").read_bytes()) == readme_entry["sha256"], "original upstream manual retained verbatim")
-    check("Copyright (c) 2026 ToffelsKater" in (PACKAGE / "LICENSE.md").read_text()
+    check("Copyright (c) 2026 ToffelsKater" in (PACKAGE / "LICENSE.md").read_text(encoding="utf-8")
           and (PACKAGE / "THIRD_PARTY_NOTICES.md").read_bytes() == (ROOT / "THIRD_PARTY_NOTICES.md").read_bytes(), "upstream license and distributed attribution retained")
 
     manifest_path = ROOT / "Tests/UnityProject/Packages/manifest.json"
-    manifest = json.loads(manifest_path.read_text())
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     dependency = manifest["dependencies"][package["name"]]
     check((manifest_path.parent / dependency.removeprefix("file:")).resolve() == PACKAGE,
           "isolated Unity harness resolves the actual local package")
-    check("2022.3.22f1" in (ROOT / "Tests/UnityProject/ProjectSettings/ProjectVersion.txt").read_text()
-          and "m_ActiveColorSpace: 1" in (ROOT / "Tests/UnityProject/ProjectSettings/ProjectSettings.asset").read_text(), "harness declares exact editor and Linear color space")
+    check("2022.3.22f1" in (ROOT / "Tests/UnityProject/ProjectSettings/ProjectVersion.txt").read_text(encoding="utf-8")
+          and "m_ActiveColorSpace: 1" in (ROOT / "Tests/UnityProject/ProjectSettings/ProjectSettings.asset").read_text(encoding="utf-8"), "harness declares exact editor and Linear color space")
 
     if args.archive:
-        files = {"package/" + str(p.relative_to(PACKAGE)): p for p in PACKAGE.rglob("*") if p.is_file()}
+        files = {"package/" + p.relative_to(PACKAGE).as_posix(): p for p in PACKAGE.rglob("*") if p.is_file()}
         with tarfile.open(args.archive, "r:gz") as archive:
             members = archive.getmembers()
             check(len(members) == len(files) and {m.name for m in members} == set(files), "tarball contains exactly the installable package files")

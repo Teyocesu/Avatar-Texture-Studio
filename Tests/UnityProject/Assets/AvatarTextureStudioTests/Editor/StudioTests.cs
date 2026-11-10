@@ -90,7 +90,7 @@ namespace AvatarTextureStudio.Tests
             byte[] shortPixels;
             using (var output = new MemoryStream())
             {
-                using (var deflate = new DeflateStream(output, CompressionLevel.Fastest, true)) deflate.WriteByte(1);
+                using (var deflate = new DeflateStream(output, System.IO.Compression.CompressionLevel.Fastest, true)) deflate.WriteByte(1);
                 shortPixels = output.ToArray();
             }
             WriteProject(path, Meta(), w => {
@@ -119,7 +119,9 @@ namespace AvatarTextureStudio.Tests
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.SaveAndReimport();
             var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(sourcePath);
-            Check(!texture.isReadable && TextureComparePanel.UnsupportedReason(texture) == null, "non-readable imported color texture can be compared");
+            ImportedComparePixels(texture);
+            Check(!texture.isReadable && TextureComparePanel.UnsupportedReason(texture) == null, "non-readable imported color texture can be compared (readable="
+                + texture.isReadable + ", format=" + texture.graphicsFormat + ", reason=" + TextureComparePanel.UnsupportedReason(texture) + ")");
             byte[] original = File.ReadAllBytes(sourcePath);
             string importerBefore = EditorJsonUtility.ToJson(importer);
             var go = new GameObject("Studio test mesh");
@@ -142,6 +144,7 @@ namespace AvatarTextureStudio.Tests
                 Check(mat.mainTexture == texture && original.SequenceEqual(File.ReadAllBytes(sourcePath)), "default export preserves original texture and shared material");
 
                 window = ScriptableObject.CreateInstance<MeshTexturePainterWindow>();
+                window.Show();
                 var flags = BindingFlags.NonPublic | BindingFlags.Instance;
                 object tab = typeof(MeshTexturePainterWindow).GetField("colorTab", flags).GetValue(window);
                 var other = new GameObject("Other root");
@@ -183,6 +186,28 @@ namespace AvatarTextureStudio.Tests
             texture.SetPixels(Enumerable.Repeat(color, 256).ToArray());
             texture.Apply();
             return texture;
+        }
+
+        static void ImportedComparePixels(Texture2D texture)
+        {
+            var material = new Material(Shader.Find("Hidden/AvatarTextureStudio/Compare"));
+            var target = RTUtil.Create("Imported Compare regression", 16, 16, RenderTextureFormat.ARGB32);
+            bool previousSrgb = GL.sRGBWrite;
+            try
+            {
+                GL.sRGBWrite = false;
+                material.SetTexture("_TexA", texture); material.SetTexture("_TexB", texture);
+                material.SetFloat("_Mode", 0); material.SetFloat("_RawValues", 1); material.SetFloat("_LinearProject", 0);
+                Graphics.Blit(texture, target, material);
+                Color actual = RTUtil.ReadPixel(target, 8, 8), expected = new Color(0.2f, 0.4f, 0.6f, 1).linear;
+                Check(Mathf.Abs(actual.r - expected.r) < 0.015f && Mathf.Abs(actual.g - expected.g) < 0.015f
+                    && Mathf.Abs(actual.b - expected.b) < 0.015f && actual.a > 0.99f,
+                    "Compare samples non-readable imported " + texture.format + " pixels on the actual GPU");
+            }
+            finally
+            {
+                GL.sRGBWrite = previousSrgb; RTUtil.Release(ref target); Object.DestroyImmediate(material);
+            }
         }
 
         static void ComparePixels()
