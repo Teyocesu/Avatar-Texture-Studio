@@ -1,4 +1,13 @@
-# Shot 2 execution plan
+# Shot 3 execution plan
+
+Active contract: Shot 3 in SPEC.md. Branch `codex/shot-3-quality-studio`, exact base `a5c90a471a8af9c75ead8cb366c891f6ef89738a`; draft targets Shot 2. Earlier branches stay unchanged and unaccepted.
+
+1. **Context/contract — complete.** Read canonical docs and provenance; fix conservative seam confidence, metrics, CPU mip semantics, read-only snapshots and resource ceilings before implementation. Native Unity/license/Windows remain unavailable.
+2. **Pure diagnostics — implemented.** Source-index/topology confidence, alpha/color/data sampling, CPU area-box mips and bounded text reports pass executable CPU fixtures. Sparse-alpha quantization exposed a failing regression; fully transparent color outputs now clear RGB and the same test passes. Existing tests remain intact.
+3. **Integrated quality workspaces — implemented.** Shared inspection/navigation, seam UV/Scene overlays, CPU mip/alpha inspection, TextureLab snapshots, quality summary and explicit new-file/report export are integrated. Native source-preservation/session/snapshot-lifetime checks are authored but unexecuted.
+4. **Product review and delivery — active.** Complete stacked lifecycle/safety/compatibility review, docs/consolidated Windows QA/evidence/HANDOFF and all available checks/package verification. Source review identified and fixed inherited TextureLab caller-lifetime coupling on this branch only; native regression remains NOT TESTED. Verify Teyocesu identities, push and open a stacked draft. No merge/tag/release; acceptance remains blocked on real native gates.
+
+## Shot 2 historical execution
 
 Active contract: Shot 2 in SPEC.md. Branch `codex/shot-2-creative-studio`, exact base `9b1d2f0e43883079e5a3596a49832cbd0668b77e`; stacked draft PR targets Shot 1's branch. Shot 1 remains unaccepted and its branch is unchanged.
 

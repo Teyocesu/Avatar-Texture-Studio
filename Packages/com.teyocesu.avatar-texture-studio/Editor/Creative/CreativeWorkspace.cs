@@ -7,6 +7,7 @@ using AvatarTextureStudio.Creative.Core;
 using AvatarTextureStudio.Infrastructure;
 using AvatarTextureStudio.Painting;
 using AvatarTextureStudio.TextureLab;
+using AvatarTextureStudio.Quality.Core;
 using UnityEditor;
 using UnityEngine;
 using N2 = System.Numerics.Vector2;
@@ -42,6 +43,19 @@ namespace AvatarTextureStudio.Creative
         [NonSerialized] bool hasSample;
         [NonSerialized] bool maskStroke;
         [NonSerialized] N2 lastMaskPoint;
+        [NonSerialized] SeamPair diagnosticEdge;
+        internal UvLayout Layout => mesh?.Layout;
+        internal string CorrespondenceReason => renderer == null ? "No renderer geometry selected." : mappingWarning;
+        internal string DiagnosticBinding
+        {
+            get
+            {
+                string Number(float n) => n.ToString("R", CultureInfo.InvariantCulture);
+                var mat = SelectedMaterial; var scale = mat != null && mat.HasProperty(property) ? mat.GetTextureScale(property) : Vector2.one;
+                var offset = mat != null && mat.HasProperty(property) ? mat.GetTextureOffset(property) : Vector2.zero;
+                return $"{(renderer != null ? Hierarchy(renderer.transform) : "no renderer")} / slot {slot} / {property} / UV{channel} / material {(mat != null ? mat.name : "missing")} / shader {(mat != null && mat.shader != null ? mat.shader.name : "missing")} / scale {Number(scale.x)},{Number(scale.y)} / offset {Number(offset.x)},{Number(offset.y)} / source {(Source != null ? AssetDatabase.GetAssetPath(Source) : "no imported source")}";
+            }
+        }
         public CreativeDocument Document => history?.Current;
         public bool Dirty => dirty;
         public bool Painting => painting;
@@ -62,6 +76,7 @@ namespace AvatarTextureStudio.Creative
         public void Leave()
         {
             active = false; painting = false; EndInteraction(); RestoreModel();
+            diagnosticEdge = null;
             SceneView.duringSceneGui -= OnSceneGUI;
         }
         public void StopPainting() { painting = false; }
@@ -285,7 +300,7 @@ namespace AvatarTextureStudio.Creative
             var texture = RTUtil.ReadToTexture(rt);
             try { return texture.GetRawTextureData<byte>().ToArray(); } finally { Object.DestroyImmediate(texture); }
         }
-        static Texture2D TextureFrom(byte[] pixels, int width, int height, bool srgb, string name, bool mipmaps = false)
+        internal static Texture2D TextureFrom(byte[] pixels, int width, int height, bool srgb, string name, bool mipmaps = false)
         {
             var texture = new Texture2D(width, height, TextureFormat.RGBA32, mipmaps, !srgb) { name = name, hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
             try { texture.SetPixelData(pixels, 0); texture.Apply(mipmaps, false); return texture; }
@@ -419,33 +434,33 @@ namespace AvatarTextureStudio.Creative
             }
             EditorGUILayout.LabelField("Left click: choose triangle/sample · middle or Alt drag: pan · wheel: zoom. Shared navigation across all creative workspaces. Raw layout shows material UV × scale + offset.", EditorStyles.wordWrappedMiniLabel);
         }
-        void DrawCanvas(Action<Color> sampleColor)
+        void DrawCanvas(Action<Color> sampleColor, Texture2D inspected = null, bool readOnly = false, bool rawValues = false, bool alphaOnly = false)
         {
-            EnsureBaseline();
-            var texture = Document != null ? (!resultStale && resultTexture != null ? resultTexture : baselineTexture) : Source;
+            if (!readOnly) EnsureBaseline();
+            var texture = inspected != null ? inspected : !readOnly && Document != null ? (!resultStale && resultTexture != null ? resultTexture : baselineTexture) : Source;
             Rect canvas = GUILayoutUtility.GetRect(0, 360, GUILayout.ExpandWidth(true)); GUI.Box(canvas, GUIContent.none);
             float aspect = texture != null ? (float)texture.width / texture.height : 1;
             float height = Mathf.Min(canvas.height - 4, (canvas.width - 4) / aspect) * zoom;
             Vector2 size = new Vector2(height * aspect, height);
             Rect image = new Rect(canvas.center + Vector2.Scale(pan, size) - size * .5f, size);
-            HandleCanvas(canvas, image, texture, sampleColor);
+            HandleCanvas(canvas, image, sampleColor, readOnly);
             if (Event.current.type != EventType.Repaint) return;
             GUI.BeginGroup(canvas);
             try
             {
                 Rect local = new Rect(image.position - canvas.position, image.size);
-                if (texture != null && TextureComparePanel.UnsupportedReason(texture, Document != null) == null)
+                if (texture != null && TextureComparePanel.UnsupportedReason(texture, inspected != null || Document != null) == null)
                 {
                     var shader = Shader.Find("Hidden/AvatarTextureStudio/Compare");
                     if (shader == null || !shader.isSupported) throw new InvalidOperationException("The Compare preview shader is missing or unsupported.");
                     if (canvasMaterial == null) canvasMaterial = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
                     canvasMaterial.SetTexture("_TexA", texture); canvasMaterial.SetTexture("_TexB", texture);
-                    canvasMaterial.SetFloat("_Mode", 0); canvasMaterial.SetFloat("_RawValues", Document == null && ColorSourceError() != null ? 1 : 0);
-                    canvasMaterial.SetFloat("_SrgbA", PaintProjectIO.IsSRGB(texture) ? 1 : 0); canvasMaterial.SetFloat("_AlphaOnly", 0);
+                    canvasMaterial.SetFloat("_Mode", 0); canvasMaterial.SetFloat("_RawValues", rawValues || (!readOnly && Document == null && ColorSourceError() != null) ? 1 : 0);
+                    canvasMaterial.SetFloat("_SrgbA", PaintProjectIO.IsSRGB(texture) ? 1 : 0); canvasMaterial.SetFloat("_AlphaOnly", alphaOnly ? 1 : 0);
                     canvasMaterial.SetFloat("_LinearProject", QualitySettings.activeColorSpace == ColorSpace.Linear ? 1 : 0);
                     EditorGUI.DrawPreviewTexture(local, texture, canvasMaterial, ScaleMode.StretchToFill);
                 }
-                if (Document != null && showRegion && Region != null) GUI.DrawTexture(local, GetRegionOverlay(), ScaleMode.StretchToFill, true);
+                if (!readOnly && Document != null && showRegion && Region != null) GUI.DrawTexture(local, GetRegionOverlay(), ScaleMode.StretchToFill, true);
                 Handles.BeginGUI();
                 try
                 {
@@ -461,15 +476,33 @@ namespace AvatarTextureStudio.Creative
                             if (selected) { Handles.color = new Color(1, .65f, .05f, .3f); Handles.DrawAAConvexPolygon(a, b, c); }
                             if (edges || selected) { Handles.color = selected ? Color.yellow : new Color(.8f, .8f, .8f, .55f); Handles.DrawAAPolyLine(1, a, b, c, a); }
                         }
+                        if (diagnosticEdge != null)
+                        {
+                            void Edge(SeamEdge e, Color color)
+                            {
+                                Handles.color = color;
+                                if (rawLayout) Handles.DrawAAPolyLine(3, Point(e.Start), Point(e.End));
+                                else
+                                {
+                                    for (int n = 0; n < 128; n++)
+                                    {
+                                        N2 a = mesh.Layout.Wrapped(N2.Lerp(e.Start, e.End, n / 128f)), b = mesh.Layout.Wrapped(N2.Lerp(e.Start, e.End, (n + 1) / 128f));
+                                        if (N2.DistanceSquared(a, b) < .25f) Handles.DrawAAPolyLine(3, Point(a), Point(b));
+                                    }
+                                }
+                            }
+                            Edge(diagnosticEdge.A, Color.cyan); Edge(diagnosticEdge.B, Color.magenta);
+                        }
                     }
                 }
                 finally { Handles.EndGUI(); }
             }
             finally { GUI.EndGroup(); }
         }
-        void HandleCanvas(Rect canvas, Rect image, Texture2D texture, Action<Color> sampleColor)
+        void HandleCanvas(Rect canvas, Rect image, Action<Color> sampleColor, bool readOnly = false)
         {
             var e = Event.current; int control = GUIUtility.GetControlID(FocusType.Passive, canvas);
+            int tool = readOnly ? 0 : this.tool;
             if (e.rawType == EventType.MouseUp) EndInteraction();
             if (e.type == EventType.ScrollWheel && canvas.Contains(e.mousePosition))
             {
@@ -527,7 +560,7 @@ namespace AvatarTextureStudio.Creative
             candidates = hits; chosen = hits.Count == 1 ? 0 : -1;
             status = hits.Count == 0 ? "No triangle at this coordinate." : hits.Count > 1 ? $"{hits.Count} possible surfaces / wrap aliases. Choose explicitly below; no surface has been selected." : "One surface selected.";
         }
-        void DrawCandidates()
+        void DrawCandidates(bool allowRegionEditing = true, Texture2D inspected = null)
         {
             if (mesh == null || candidates.Count == 0) return;
             var names = new[] { "Choose a surface…" }.Concat(candidates.Select(h => $"Triangle {mesh.Layout.Triangles[h.Triangle].Id} / submesh {mesh.Layout.Triangles[h.Triangle].Submesh} · mesh UV {h.MeshUv.X:F4}, {h.MeshUv.Y:F4} · tile {h.TileX}, {h.TileY}")).ToArray();
@@ -535,10 +568,10 @@ namespace AvatarTextureStudio.Creative
             if (next != chosen) { chosen = next; SceneView.RepaintAll(); }
             if (chosen < 0) return;
             var h = candidates[chosen]; var wrapped = mesh.Layout.Wrapped(h.TextureUv);
-            int width = Document?.Baseline.Width ?? (Source != null ? Source.width : 0), height = Document?.Baseline.Height ?? (Source != null ? Source.height : 0);
+            int width = inspected != null ? inspected.width : Document?.Baseline.Width ?? (Source != null ? Source.width : 0), height = inspected != null ? inspected.height : Document?.Baseline.Height ?? (Source != null ? Source.height : 0);
             int x = Math.Min(width - 1, (int)(wrapped.X * width)), y = Math.Min(height - 1, (int)(wrapped.Y * height));
             EditorGUILayout.LabelField($"Mesh UV {h.MeshUv.X:F6}, {h.MeshUv.Y:F6} · material UV {h.TextureUv.X:F6}, {h.TextureUv.Y:F6} · sampled {wrapped.X:F6}, {wrapped.Y:F6} · pixel ({x}, {y}), bottom-left", EditorStyles.wordWrappedMiniLabel);
-            using (new EditorGUI.DisabledScope(Region == null || mappingWarning != null || !BindingMatches() || !mesh.Layout.Rasterizable.Contains(h.Triangle)))
+            using (new EditorGUI.DisabledScope(!allowRegionEditing || Region == null || mappingWarning != null || !BindingMatches() || !mesh.Layout.Rasterizable.Contains(h.Triangle)))
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Add triangle to region")) TriangleMask(h, true);
@@ -554,7 +587,7 @@ namespace AvatarTextureStudio.Creative
             if (!active || painting || mesh == null || renderer == null || EditorApplication.isPlayingOrWillChangePlaymode) return;
             try
             {
-                if (mesh.Refresh()) { candidates.Clear(); chosen = -1; repaint?.Invoke(); }
+                if (mesh.Refresh()) { candidates.Clear(); chosen = -1; diagnosticEdge = null; repaint?.Invoke(); }
                 var e = Event.current;
                 if (scenePick && e.type == EventType.Layout && !e.alt) HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
                 if (scenePick && e.type == EventType.MouseDown && e.button == 0 && !e.alt)
@@ -572,6 +605,16 @@ namespace AvatarTextureStudio.Creative
                 {
                     var t = mesh.Layout.Triangles[candidates[chosen].Triangle]; Color previous = Handles.color;
                     try { Handles.color = new Color(1, .6f, 0, .45f); Handles.DrawAAConvexPolygon(CreativeMeshAdapter.ToUnity(t.A), CreativeMeshAdapter.ToUnity(t.B), CreativeMeshAdapter.ToUnity(t.C)); }
+                    finally { Handles.color = previous; }
+                }
+                if (e.type == EventType.Repaint && diagnosticEdge != null)
+                {
+                    Color previous = Handles.color;
+                    try
+                    {
+                        Handles.color = Color.cyan; Handles.DrawAAPolyLine(4, CreativeMeshAdapter.ToUnity(diagnosticEdge.A.WorldStart), CreativeMeshAdapter.ToUnity(diagnosticEdge.A.WorldEnd));
+                        Handles.color = Color.magenta; Handles.DrawAAPolyLine(2, CreativeMeshAdapter.ToUnity(diagnosticEdge.B.WorldStart), CreativeMeshAdapter.ToUnity(diagnosticEdge.B.WorldEnd));
+                    }
                     finally { Handles.color = previous; }
                 }
             }
@@ -636,21 +679,55 @@ namespace AvatarTextureStudio.Creative
         void Export()
         {
             if (!UpdatePreview()) return;
-            string path = EditorUtility.SaveFilePanel("Export new Colorway PNG", "Assets", "Colorway", "png"); if (string.IsNullOrEmpty(path)) return;
-            string assetPath = SafeFileIO.ExportAssetPath(path, Path.GetFullPath("."));
-            if (File.Exists(path) || File.Exists(path + ".meta")) throw new IOException("Colorway exports require a new asset path. Choose a different filename; existing assets are preserved.");
-            byte[] png = resultTexture.EncodeToPNG(); SafeFileIO.Write(path, s => s.Write(png, 0, png.Length), false);
-            AssetDatabase.ImportAsset(assetPath);
-            var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
-            if (importer == null) throw new IOException("PNG was written, but its new texture importer is unavailable: " + assetPath);
-            importer.sRGBTexture = Document.Baseline.IsSRGB; importer.alphaSource = TextureImporterAlphaSource.FromInput;
-            importer.alphaIsTransparency = false; importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.maxTextureSize = Mathf.NextPowerOfTwo(Math.Max(32, Math.Max(Document.Baseline.Width, Document.Baseline.Height)));
-            importer.npotScale = TextureImporterNPOTScale.None;
-            importer.wrapModeU = (TextureWrapMode)Document.Binding.WrapU; importer.wrapModeV = (TextureWrapMode)Document.Binding.WrapV;
-            importer.SaveAndReimport();
+            string assetPath = NewImageExport.Save(resultTexture, Document.Baseline.IsSRGB, (TextureWrapMode)Document.Binding.WrapU, (TextureWrapMode)Document.Binding.WrapV, "Colorway");
+            if (assetPath == null) return;
             status = "Exported new PNG: " + assetPath + ". Its new importer matches the source transfer and preserves alpha/RGB without compression. No material assignment or source overwrite was performed.";
         }
+        internal void DrawDiagnosticInspection(PaintSession session, Texture2D inspected, bool rawValues, bool alphaOnly)
+        {
+            DrawTarget(session); if (renderer != null) EnsureMesh();
+            if (CorrespondenceReason != null) EditorGUILayout.HelpBox(CorrespondenceReason, MessageType.Warning);
+            DrawNavigation(); DrawCanvas(null, inspected, true, rawValues, alphaOnly); DrawCandidates(false, inspected);
+        }
+        internal void SetDiagnosticEdge(SeamPair edge) { diagnosticEdge = edge; SceneView.RepaintAll(); }
+        internal UvTriangle[] CaptureDiagnosticTopology(Func<float, bool> cancel)
+        {
+            if (mesh == null) throw new InvalidOperationException("Select supported source geometry before seam analysis.");
+            var result = mesh.CaptureTopology(cancel); candidates.Clear(); chosen = -1; diagnosticEdge = null; return result;
+        }
+        internal ColorImage CaptureDiagnosticImage(int sourceKind, PaintSession color, PaintSession masks, out string provenance, out UvWrap wrapU, out UvWrap wrapV, out bool bindingMatches)
+        {
+            wrapU = Source != null ? (UvWrap)Source.wrapModeU : UvWrap.Repeat; wrapV = Source != null ? (UvWrap)Source.wrapModeV : UvWrap.Repeat; bindingMatches = true;
+            if (sourceKind == 3)
+            {
+                if (Document == null) throw new InvalidOperationException("Open/capture a Colorway document first.");
+                provenance = $"Current editable Colorway / CPU RGBA8 / recorded {Document.Binding.Renderer} / slot {Document.Binding.Slot} / {Document.Binding.Property} / UV{Document.Binding.Channel}";
+                wrapU = Document.Binding.WrapU; wrapV = Document.Binding.WrapV; bindingMatches = BindingMatches();
+                return new ColorImage(Document.Baseline.Width, Document.Baseline.Height, Document.Baseline.IsSRGB,
+                    ColorwayProcessor.Render(Document, p => EditorUtility.DisplayCancelableProgressBar("Quality snapshot", "Computing current Colorway…", p)));
+            }
+            string gpu = PaintResources.UnsupportedReason(); if (gpu != null) throw new InvalidOperationException(gpu);
+            if (sourceKind == 1 || sourceKind == 2)
+            {
+                if (Source != null && TextureComparePanel.UnsupportedReason(Source) is string unsupported) throw new InvalidOperationException(unsupported);
+                var part = (sourceKind == 1 ? color : masks)?.Parts.FirstOrDefault(Matches);
+                if (part == null) throw new InvalidOperationException("The selected painting/mask session does not match this renderer, slot, property and channel. Adopt its target first.");
+                provenance = sourceKind == 1 ? "Painting composite / GPU RGBA8 readback" : "Shader-mask composite / GPU stored-channel readback";
+                bindingMatches = part.Target.WrapU == (TextureWrapMode)wrapU && part.Target.WrapV == (TextureWrapMode)wrapV;
+                wrapU = (UvWrap)part.Target.WrapU; wrapV = (UvWrap)part.Target.WrapV;
+                return new ColorImage(part.Document.Width, part.Document.Height, part.Document.IsSRGB, ReadPixels(part.Document.GetComposite()));
+            }
+            string reason = TextureComparePanel.UnsupportedReason(Source); if (reason != null) throw new InvalidOperationException(reason);
+            var source = Source; bool srgb = PaintProjectIO.IsSRGB(source);
+            if (source.width > 8192 || source.height > 8192) throw new InvalidOperationException("Diagnostic input is limited to 8192 pixels per axis.");
+            provenance = $"Imported GPU mip-0 readback / {source.format} / {source.mipmapCount} imported mips. May already contain platform compression; generated diagnostics are CPU approximations.";
+            using (var doc = new PaintDocument(source.width, source.height))
+            {
+                var rt = doc.RenderImported(source, srgb);
+                try { return new ColorImage(source.width, source.height, srgb, ReadPixels(rt)); } finally { RTUtil.Release(ref rt); }
+            }
+        }
+        internal bool DiagnosticIsData(int sourceKind) => sourceKind == 2 || (sourceKind == 0 && (SelectedMaterial == null || !MeshTexturePainterWindow.ColorTextureProperties(SelectedMaterial).Contains(property)));
         public void EndInteraction() { if (dragControl != 0 && GUIUtility.hotControl == dragControl) GUIUtility.hotControl = 0; dragControl = 0; maskStroke = false; }
         static void Destroy(ref Texture2D texture) { if (texture != null) Object.DestroyImmediate(texture); texture = null; }
         void ReleaseTextures() { Destroy(ref baselineTexture); Destroy(ref resultTexture); Destroy(ref regionTexture); Destroy(ref modelTexture); Destroy(ref compareAfter); }

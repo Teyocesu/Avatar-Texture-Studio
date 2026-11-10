@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="../../Packages/com.teyocesu.avatar-texture-studio/Editor/Infrastructure/SafeFileIO.cs" Link="SafeFileIO.cs" />
     <Compile Include="../../Packages/com.teyocesu.avatar-texture-studio/Editor/Creative/Core/*.cs" Link="CreativeCore/%(Filename)%(Extension)" />
+    <Compile Include="../../Packages/com.teyocesu.avatar-texture-studio/Editor/Quality/Core/*.cs" Link="QualityCore/%(Filename)%(Extension)" />
     <Reference Include="Microsoft.CodeAnalysis">
       <HintPath>$(MSBuildSDKsPath)/../Roslyn/bincore/Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>

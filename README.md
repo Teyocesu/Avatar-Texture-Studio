@@ -1,8 +1,8 @@
 # Avatar Texture Studio
 
-An MIT Unity Editor package for avatar painting, UV inspection, editable region Colorways, manual Face Studio and texture comparison in one window.
+An MIT Unity Editor package for avatar painting, UV inspection, editable region Colorways, manual Face Studio, texture comparison and SeamDoctor/MipDoctor diagnostics in one window.
 
-**Shot 2: implemented but not accepted, stacked on unaccepted Shot 1.** CPU/file and structural verification is available; actual Unity compilation, GPU rendering, interaction and Windows 11 avatar QA have not been run. Unity/Hub is unavailable on the development Mac. See [verification](docs/VERIFICATION.md) and the [Windows checklist](docs/WINDOWS_QA.md). No release has been published.
+**Shots 1–3: planned implementation complete, NOT ACCEPTED.** CPU/file and structural verification is available; actual Unity compilation, GPU rendering, interaction and Windows 11 avatar QA have not been run. Unity/Hub is unavailable on the development Mac. See [verification](docs/VERIFICATION.md) and the [Windows checklist](docs/WINDOWS_QA.md). Version 0.3.0 is unreleased; no release has been published.
 
 The painting foundation derives from [VRC Texture Painter](https://github.com/ToffelsKater/VRC-Texture-Painter/tree/29bbf3c728d55091190413066e549b0bbbb21bf6), pinned to `29bbf3c728d55091190413066e549b0bbbb21bf6` (1.2.0), © 2026 ToffelsKater, MIT. [Attribution](THIRD_PARTY_NOTICES.md).
 
@@ -13,7 +13,7 @@ Target **Unity 2022.3.22f1, Built-in Render Pipeline, Linear color space**. Wind
 1. Create an empty **3D (Built-In)** Unity project, separate from your avatar project. Set Player > Other Settings > Color Space to **Linear**.
 2. **Remove VRC Texture Painter if present.** Retained asset GUIDs prevent co-installation. Save `.mtpaint` projects before removing it; Studio keeps the version 1/2 format.
 3. Clone this repository/feature branch. In Unity, open **Window > Package Manager > + > Add package from disk** and select `Packages/com.teyocesu.avatar-texture-studio/package.json` from the clone. The repository root is not a Unity project.
-4. Alternatively, run `python3 tools/package.py` and use **Add package from tarball** to select `artifacts/com.teyocesu.avatar-texture-studio-0.2.0.tgz`. This builds locally without publishing. Tarball installation avoids editing the checkout through a local package reference.
+4. Alternatively, run `python3 tools/package.py` and use **Add package from tarball** to select `artifacts/com.teyocesu.avatar-texture-studio-0.3.0.tgz`. This builds locally without publishing. Tarball installation avoids editing the checkout through a local package reference.
 5. Wait for import/compilation, inspect Console, and open **Tools > Avatar Texture Studio**. Complete [Windows QA](docs/WINDOWS_QA.md) with synthetic fixtures first. Only then evaluate a backed-up copy of an avatar project.
 
 The package adds no runtime scripts or avatar components. Installation and real compilation remain unverified in this phase.
@@ -77,10 +77,25 @@ Creative recovery uses `Library/AvatarTextureStudio/CreativeAutosave.atsstudio` 
 
 In **Face Studio**, manually select the mesh/texture and create a **New face preset** or mark any shared region as a **Face preset**. Name it as useful for your avatar; there is no anatomy or face detection assumption. Use the same UV/mask/color controls for precise work. **Paint with existing tools** activates the matching color Painting session and shows its real brushes/layers/output below. If another color session is open, save/stop it or adopt that target; it is never discarded. Region masks constrain Colorway recoloring; existing paint brushes keep their ordinary layer behavior. Face painting requires identity material tiling/offset because the retained painter uses raw UVs. Capture a new composite explicitly to bring painting edits into the frozen Colorway baseline. While Face painting is active, Compare uses that composite as the after snapshot.
 
+## Review seams, mipmaps and export
+
+**SeamDoctor** and **MipDoctor** share the existing target and UV navigation. Use the two-row workspace selector to move between editing, comparison and diagnostics without closing painting/mask/creative documents.
+
+1. Select/adopt a renderer, material property and UV channel. Choose an explicit diagnostic source: imported texture GPU mip 0, matching Painting/Masks composite, or current Colorway result. Shader-data/mask sources use raw-channel diagnostics. Normal packing, HDR and virtual-only inputs are rejected. A GPU readback may already contain platform compression; it is not original file pixels.
+2. **Capture and analyze** freezes pixels/topology and builds CPU diagnostic levels. Recapture after editing, Undo, posing, reimport or shader changes. Geometry/selection/Colorway changes invalidate model overlays; source freshness is not reverified automatically. Failed/cancelled work leaves the previous labelled snapshot and all editable work intact.
+3. In **SeamDoctor**, choose a candidate pair. Cyan/magenta edges show its two UV sides and corresponding 3D edge. Read triangle/vertex/submesh/slot/channel identities, sample counts, unresolved samples, mean/worst Oklab×100, alpha and composite/raw-channel differences. Oklab is N/A for data or without two visible colors. Both-transparent hidden RGB is not a visible-color defect.
+4. Candidate geometry is deliberately conservative: exact source positions, unique opposing edges, indexed manifold connectivity, matching posed endpoints and one material/submesh. Disconnected UV islands, unrelated coincident pieces, nonmanifold/duplicate edges, collapsed UVs and uncertain shader mappings remain unmeasured. Consequently some real seams are missed. No relationship is invented from positional coincidence alone. Cross-material/ambiguous-slot seams are unsupported.
+5. In **MipDoctor**, select CPU levels through 1×1, inspect alpha and **Measure this CPU level**. The recursive area-box filter integrates odd dimensions, decodes sRGB for color, filters premultiplied linear color/alpha, clears RGB when output alpha rounds to zero, and quantizes each level to RGBA8. Raw data averages RGBA independently. The deterministic filter is **not exact Unity mip generation, platform compression or VRChat rendering**.
+6. **Compare base / CPU level** opens independent owned copies in TextureLab, with explicit CPU provenance. Differing dimensions retain its side-by-side/individual views and overlay restriction. These copies survive regeneration/release of caller previews and are freed by TextureLab when replaced/closed.
+7. The quality summary separates measurements, potential boundary/exterior-ring contrasts, unmeasured/unsupported geometry and unverified rendering. A normalized contrast above 0.05 is a review hint, not an error verdict; deliberate hard transitions and alpha boundaries may be correct. Exterior probes and increases at reduced resolution can suggest bleeding/padding concerns without proving a visible defect.
+8. **Export report** writes a new bounded UTF-8 `.txt` report with provenance, limitations, counts and per-level metrics. **Export snapshot PNG** writes the frozen **base** image, not the selected reduced mip, to a new Assets filename. It preserves the existing explicit new-PNG contract and never assigns materials or overwrites sources. Diagnostic warnings do not change compression, importers, texture pixels or avatar data. Painting/Colorway export remains available through the linked workspaces.
+
+Limits: whole-source topology ≤250,000 triangles, ≤10,000 candidate pairs, ≤256 samples/edge and one million/level, existing UV tile/fragment limits, ≤14 CPU mip levels / 384 MiB decoded chain pixels and ≤8 MiB report text. Very thin triangles at low resolution can have no interior samples; those results are N/A. Ordinary bilinear diagnostic sampling and area-box mip filtering do not model a shader's actual sampler. Large-workload latency/memory and native source preservation remain physical QA gates. No automatic seam repair or export-readiness PASS is provided.
+
 ## Develop and verify
 
 - `python3 tools/verify_repository.py`: package/GUID/shader/license/provenance integrity.
-- `dotnet run --project Tests/FileSafety/FileSafety.csproj -- <absolute-repository-path>`: .NET 8 filesystem, UV, region, color, history and sidecar regressions, plus C# 9 syntax parsing using SDK-bundled Roslyn. This is **not Unity compilation**. Symlink tests need permission to create links.
+- `dotnet run --project Tests/FileSafety/FileSafety.csproj -- <absolute-repository-path>`: .NET 8 filesystem, creative and quality regressions plus C# 9 syntax parsing using SDK-bundled Roslyn. This is **not Unity compilation**. Symlink tests need permission to create links.
 - Open **Tests/UnityProject** in licensed Unity 2022.3.22f1. Its local dependency points at this checkout and Player settings declare Linear. Run the preserved GPU suite and Studio checks with [Windows QA commands](docs/WINDOWS_QA.md), never in an avatar project.
 
 [SPEC](SPEC.md) · [PLAN](PLAN.md) · [architecture](docs/ARCHITECTURE.md) · [upstream audit](docs/UPSTREAM.md) · [verification](docs/VERIFICATION.md) · [HANDOFF](HANDOFF.md).

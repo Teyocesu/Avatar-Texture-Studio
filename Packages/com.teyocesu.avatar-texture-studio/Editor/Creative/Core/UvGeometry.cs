@@ -12,6 +12,9 @@ namespace AvatarTextureStudio.Creative.Core
         public int Id, Submesh, Slot, Channel;
         public Vector3 A, B, C;
         public Vector2 U, V, W;
+        public int IndexA, IndexB, IndexC;
+        public Vector3 SourceA, SourceB, SourceC;
+        public bool UnsupportedForDiagnostics;
         public Vector3 Point(Vector3 weights) => A * weights.X + B * weights.Y + C * weights.Z;
         public Vector2 MeshUv(Vector3 weights) => U * weights.X + V * weights.Y + W * weights.Z;
     }

@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace AvatarTextureStudio.TextureLab
 {
-    /// <summary>Read-only imported-texture inspection. Owns only its preview material and navigation.</summary>
+    /// <summary>Read-only asset/snapshot comparison. Owns its material and independent snapshot copies, never imported assets.</summary>
     [Serializable]
     internal sealed class TextureComparePanel : IDisposable
     {
@@ -23,23 +23,33 @@ namespace AvatarTextureStudio.TextureLab
         [NonSerialized] Material material;
         [NonSerialized] int dragControl;
         [NonSerialized] bool ownedPreviews;
+        [NonSerialized] string snapshotProvenance;
+        [NonSerialized] Texture2D ownedA, ownedB;
 
-        public void SetPreviews(Texture2D before, Texture2D after)
+        public void SetPreviews(Texture2D before, Texture2D after, bool asRawData = false, string provenance = null)
         {
-            textureA = before; textureB = after; ownedPreviews = true;
-            rawValues = false; alphaOnly = false; view = 0; ResetNavigation();
+            string error = UnsupportedReason(before, true) ?? UnsupportedReason(after, true);
+            if (error != null) throw new InvalidOperationException(error);
+            var nextA = Object.Instantiate(before); Texture2D nextB;
+            try { nextB = Object.Instantiate(after); }
+            catch { Object.DestroyImmediate(nextA); throw; }
+            nextA.hideFlags = nextB.hideFlags = HideFlags.HideAndDontSave;
+            ReleaseOwned(); ownedA = nextA; ownedB = nextB;
+            textureA = ownedA; textureB = ownedB; ownedPreviews = true;
+            rawValues = asRawData; alphaOnly = false; view = 0; snapshotProvenance = provenance; ResetNavigation();
         }
 
         public void Draw(Action repaint)
         {
             if (Event.current.rawType == EventType.MouseUp) EndInteraction();
             EditorGUILayout.LabelField("TextureLab · Compare", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox(ownedPreviews ? "Read-only creative snapshots. Editable masks, adjustments and painting layers stay in their workspaces. Select assets below to return to asset comparison."
+            EditorGUILayout.HelpBox(ownedPreviews ? "Read-only Studio snapshots. Editable work stays in its workspace. Select assets below to return to asset comparison."
                 : "Read-only imported assets. Painting and mask sessions stay open while you compare. CPU Read/Write access is not required.", MessageType.Info);
+            if (ownedPreviews && !string.IsNullOrEmpty(snapshotProvenance)) EditorGUILayout.HelpBox(snapshotProvenance, MessageType.Info);
             EditorGUI.BeginChangeCheck();
             textureA = (Texture2D)EditorGUILayout.ObjectField("Texture A", textureA, typeof(Texture2D), false);
             textureB = (Texture2D)EditorGUILayout.ObjectField("Texture B", textureB, typeof(Texture2D), false);
-            if (EditorGUI.EndChangeCheck()) { ownedPreviews = false; ResetNavigation(); }
+            if (EditorGUI.EndChangeCheck()) { ReleaseOwned(); ownedPreviews = false; snapshotProvenance = null; ResetNavigation(); }
             DrawMetadata("A", textureA);
             DrawMetadata("B", textureB);
 
@@ -212,8 +222,17 @@ namespace AvatarTextureStudio.TextureLab
         public void Dispose()
         {
             EndInteraction();
+            ReleaseOwned();
             if (material != null) Object.DestroyImmediate(material);
             material = null;
+        }
+        void ReleaseOwned()
+        {
+            if (textureA == ownedA || textureA == ownedB) textureA = null;
+            if (textureB == ownedA || textureB == ownedB) textureB = null;
+            if (ownedA != null) Object.DestroyImmediate(ownedA);
+            if (ownedB != null) Object.DestroyImmediate(ownedB);
+            ownedA = ownedB = null;
         }
     }
 }
