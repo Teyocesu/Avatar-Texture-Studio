@@ -1,6 +1,21 @@
 # Windows 11 acceptance checklist
 
-Status: **NOT TESTED**. Record editor version, Windows build, GPU/driver, API, color space, package commit and observations with screenshots/logs. Do not mark a gate passed from source inspection or from this checklist's existence.
+Status: **PARTIALLY EXECUTED, NO-GO — 2026-11-10**. The native suites and a limited UI flow ran on Windows 11 / RTX 4050 / Unity 2022.3.22f1 / Linear / DX11. See the current record in [VERIFICATION.md](VERIFICATION.md) for exact evidence and remaining gaps. The checklists below describe required coverage, not completed human QA. No owner interaction or proprietary shader/avatar test is claimed.
+
+## Owner continuation script
+
+Use a fresh isolated checkout (`git -c core.autocrlf=false clone ...`) and the stabilization branch. Do not open the original avatar project. Preserve Console errors, screenshots and before/after SHA-256 hashes; stop on a failed invariant.
+
+1. Run the two existing GPU commands below and retain both completion markers, Linear/Direct3D11 lines and an error-free log. Keep `-nographics` absent. Close Unity before batch execution. Use a fresh disposable project when changing tarball paths; a reused cache produced transient CS2001 errors even with an eventual successful suite marker.
+2. On synthetic MeshRenderer and posed SkinnedMeshRenderer fixtures, paint asymmetric colored/alpha strokes with every brush, exercise layers and mixed Undo/Redo, and export a new unassigned PNG. Inspect color/orientation/alpha, occlusion, padding and source texture/meta/material/mesh hashes. Cancel overwrite/assignment dialogs and verify unchanged bytes. Exercise locked/read-only save destinations and retained recovery paths. Physical tablet pressure requires the owner's device.
+3. In UV Explorer, explicitly select overlapping/mirrored/reversed candidates, UV0/UV7 and multiple material slots; test collapsed and out-of-range mappings. In Colorway, create/refine overlapping regions, change parameters, undo entire gestures, cancel a large preview and export. Check all alpha and unselected pixels, gamut appearance, stale-state labels and preview restoration. Use known non-square/NPOT color/alpha ramps first.
+4. In Face Studio, use manual face regions/preset flags and the existing painting tools/layers; switch to before/after Compare and back. Confirm another painting target is retained and unsupported material transforms are blocked. Save/reopen standalone and companion `.atsstudio` files with masks/parameters/navigation intact; corrupt opens and partial companion saves must retain existing work. Full UI creative/Face acceptance is still pending.
+5. Use a connected UV-split seam fixture with known reversed edges and disconnected coincident controls. Inspect overlays/measurements/exclusions, deliberate hard colors, transparent hidden RGB and raw data. Inspect NPOT CPU mip levels through 1x1 and compare them separately with actual Unity-generated/compressed mips at near/far distances. CPU levels do not establish shader appearance or seam intent.
+6. From every workspace, repeat dirty reload, Edit/Play/Edit with domain reload on and off, lost focus, window resize, Save/Discard/Cancel and reopen/restart recovery. Confirm layers, masks, editable parameters, dirty/path state and bounded texture/handler/property-block ownership. The executed UI run covered painting reload and one default-domain-reload Play cycle, not this whole matrix.
+7. Only with legitimate copies, install Poiyomi/lilToon in a separate disposable shader project. Verify supported painting and keep custom/unverified shader UV correspondence unsupported. Do not import or bundle proprietary assets into the repository.
+8. Only after synthetic gates pass, inspect a backed-up real-avatar copy with human visual/input/performance judgment. Record GPU/driver, native mip/compression and alpha/shading observations. Run Metal separately. Mark only observed checks complete; owner execution has not been performed by this task.
+
+Full optional FileSafety execution additionally requires an account/environment able to create directory and file symbolic links and .NET 8. Do not skip its symlink assertions or change Windows security settings just to obtain a PASS. This machine's full run is blocked at that privilege boundary; the separate unchanged Creative/Quality subset has executed successfully.
 
 ## Consolidated order for the complete product
 

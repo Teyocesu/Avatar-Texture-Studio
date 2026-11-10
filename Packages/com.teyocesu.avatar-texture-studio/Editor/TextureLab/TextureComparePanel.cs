@@ -193,7 +193,11 @@ namespace AvatarTextureStudio.TextureLab
                 case TextureFormat.RGB9e5Float: case TextureFormat.BC6H:
                     return "HDR/float textures require an exposure-aware comparison, deferred beyond Shot 1.";
             }
-            if (!SystemInfo.IsFormatSupported(texture.graphicsFormat, FormatUsage.Sample))
+            // Unity expands RGB24 to RGBA32 at load time; its reported storage format may remain RGB24.
+            // https://docs.unity3d.com/2022.3/Documentation/ScriptReference/TextureFormat.RGB24.html
+            var sampledFormat = texture.format == TextureFormat.RGB24
+                ? GraphicsFormatUtility.GetGraphicsFormat(TextureFormat.RGBA32, IsSRGB(texture)) : texture.graphicsFormat;
+            if (!SystemInfo.IsFormatSupported(sampledFormat, FormatUsage.Sample))
                 return "The graphics device cannot sample this imported format: " + texture.graphicsFormat;
             return null;
         }
