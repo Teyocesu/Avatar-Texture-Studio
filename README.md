@@ -1,8 +1,8 @@
 # Avatar Texture Studio
 
-An MIT Unity Editor package for painting avatar textures and shader masks, keeping editable layers/projects, exporting PNGs, and comparing imported textures in one window.
+An MIT Unity Editor package for avatar painting, UV inspection, editable region Colorways, manual Face Studio and texture comparison in one window.
 
-**Shot 1: implemented but not accepted.** File-level verification is available; actual Unity compilation, GPU rendering, interaction and Windows 11 avatar QA have not been run. Unity/Hub is unavailable on the development Mac. See [verification](docs/VERIFICATION.md) and the [Windows checklist](docs/WINDOWS_QA.md). No release has been published.
+**Shot 2: implemented but not accepted, stacked on unaccepted Shot 1.** CPU/file and structural verification is available; actual Unity compilation, GPU rendering, interaction and Windows 11 avatar QA have not been run. Unity/Hub is unavailable on the development Mac. See [verification](docs/VERIFICATION.md) and the [Windows checklist](docs/WINDOWS_QA.md). No release has been published.
 
 The painting foundation derives from [VRC Texture Painter](https://github.com/ToffelsKater/VRC-Texture-Painter/tree/29bbf3c728d55091190413066e549b0bbbb21bf6), pinned to `29bbf3c728d55091190413066e549b0bbbb21bf6` (1.2.0), © 2026 ToffelsKater, MIT. [Attribution](THIRD_PARTY_NOTICES.md).
 
@@ -13,7 +13,7 @@ Target **Unity 2022.3.22f1, Built-in Render Pipeline, Linear color space**. Wind
 1. Create an empty **3D (Built-In)** Unity project, separate from your avatar project. Set Player > Other Settings > Color Space to **Linear**.
 2. **Remove VRC Texture Painter if present.** Retained asset GUIDs prevent co-installation. Save `.mtpaint` projects before removing it; Studio keeps the version 1/2 format.
 3. Clone this repository/feature branch. In Unity, open **Window > Package Manager > + > Add package from disk** and select `Packages/com.teyocesu.avatar-texture-studio/package.json` from the clone. The repository root is not a Unity project.
-4. Alternatively, run `python3 tools/package.py` and use **Add package from tarball** to select `artifacts/com.teyocesu.avatar-texture-studio-0.1.0.tgz`. This builds locally without publishing. Tarball installation avoids editing the checkout through a local package reference.
+4. Alternatively, run `python3 tools/package.py` and use **Add package from tarball** to select `artifacts/com.teyocesu.avatar-texture-studio-0.2.0.tgz`. This builds locally without publishing. Tarball installation avoids editing the checkout through a local package reference.
 5. Wait for import/compilation, inspect Console, and open **Tools > Avatar Texture Studio**. Complete [Windows QA](docs/WINDOWS_QA.md) with synthetic fixtures first. Only then evaluate a backed-up copy of an avatar project.
 
 The package adds no runtime scripts or avatar components. Installation and real compilation remain unverified in this phase.
@@ -54,10 +54,33 @@ Different dimensions keep individual views available and block overlay/differenc
 - Projects support up to 32 textures, 1024 layers, 8192 pixels per axis, 1 MiB JSON fields and 2 GiB decoded layer pixels. Layer additions beyond the budget fail visibly; split large work. Actual GPU memory limits can be lower. Standard upstream version 1/2 files remain compatible within these bounds.
 - Windows tablets, shader visuals, mask/color accuracy, recovery, interaction and real avatar integration are **NOT TESTED**. Metal is also untested. Inspection does not establish acceptance.
 
+## Explore UVs and make Colorways
+
+**UV Explorer**, **Colorway** and **Face Studio** share the same target, UV navigation, selection and creative document. Painting/Masks retain their own existing sessions and layers when switching workspaces.
+
+1. In UV Explorer, select a scene MeshRenderer/SkinnedMeshRenderer, material slot, texture property and available UV0–UV7. **Use target** adopts a chosen texture from the open Painting session. **Refresh source geometry** updates mesh edits made elsewhere; pose/transform changes refresh automatically.
+2. Inspect triangle edges and material scale/offset on the texture. **Raw transformed layout** exposes UVs outside 0–1; otherwise Repeat/Mirror triangles are clipped into sampled texture tiles. Wheel zoom and middle/Alt drag pan are shared across the creative workspaces. Pick a triangle in the canvas or enable **Pick selected renderer in Scene**. A Scene pick centers its UV point. The surface chooser lists all overlapping/mirrored/wrap matches; ambiguous picks select nothing until you choose explicitly. The selected triangle is highlighted in Scene view.
+3. Read source UV, material UV, sampled UV and bottom-left pixel coordinates. **Capture color baseline** takes a frozen RGBA8 snapshot without enabling Read/Write on the source. For a matching Painting target it captures the current composite. The eyedropper samples the displayed baseline/result, excluding mask tint, and updates the shared color brush.
+4. In Colorway, create/name a region, choose a triangle, and **Add triangle to region**. Refine with **Add pixels / Subtract pixels** and a pixel radius; strokes interpolate between pointer events. Cyan shows the active mask. Shared UV texels recolor every surface using them; choosing a surface cannot split a shared texture pixel.
+5. Adjust **Hue rotation**, **Chroma ×** and **Strength** or disable a region's adjustment. **Update preview** computes the current result; cancellation retains the editable work. Oklab preserves perceptual lightness through hue/chroma changes and gamut reduction. It does not promise exact physical luminance. Unselected RGBA and all alpha bytes remain exact; RGB is quantized once to RGBA8 after the ordered adjustments. Creative Undo/Redo restores masks and parameters independently of Unity's painting history.
+6. **Preview on model** temporarily displays the result, with optional region tint. **Compare before / after** opens owned snapshots in TextureLab. **Export new PNG** requires a new Assets filename, preserves source transfer/alpha/dimensions/wrap in the new import and never assigns it to a material. Save the editable Studio project separately. A same-size baseline refresh retains masks and can be undone; replacing dimensions prompts for saving/discarding creative work.
+
+Verified shader correspondence is deliberately limited to `_MainTex` / UV0 on Standard, Standard (Specular setup), Unlit/Texture, Unlit/Transparent and Unlit/Transparent Cutout with material scale/offset. Other/custom/non-UV/decal mappings remain geometric inspection with an explicit warning; triangle-to-region and model previews are blocked for them. Direct image masking remains available for supported main/decal color properties. Normal-map, data-mask, HDR and virtual-only sources are excluded from color capture. UV1–UV7 can still be inspected geometrically; an arbitrary shader's sampling is not inferred from its channel number.
+
+Collapsed UVs have no reverse area. Clamp/MirrorOnce tails collapse onto a border and cannot produce a unique border inverse; raw/Scene inspection remains available. Triangle masks exclude those collapsed tails. Wrapped selection is limited to 16 tiles per axis; geometry is bounded to 250,000 triangles per selected slot and approximately one million sampled fragments. Excess geometry is reported, not silently truncated into regions. Picking considers the selected renderer's triangles, including backfaces; it does not resolve occlusion by other renderers. Large layouts/images can be slow and memory intensive; performance is not yet measured in Unity.
+
+## Keep editable creative and Face work
+
+**Save / Save As / Open Studio** use self-contained `.atsstudio` files: baseline pixels, named masks, editable adjustments, Face flags, texture binding and navigation. `ATSCRV01` version 1 is independent of MTPAINT1/2; `.mtpaint` bytes/loaders are unchanged. Saving a related color painting also saves `<painting>.atsstudio`; opening that painting restores a matching companion after unsaved-work handling. Each file is replaced independently. If companion saving fails or is cancelled, the painting may already be saved; creative work stays dirty with an explicit message. Replacing a different existing companion asks first.
+
+Creative recovery uses `Library/AvatarTextureStudio/CreativeAutosave.atsstudio` and Unity SessionState across reload/Play, retaining saved path and dirty state. Failed loads retain the current document and recovery file. After quitting Unity, manually open the saved/Library `.atsstudio` file and select its recorded renderer/material/property/UV binding. No Unity object references or history are stored in the sidecar. Limits are 8192 per axis, 32 regions, 512 MiB decoded data with metadata reserve, and 4096-character fields. Creative history retains at most 24 steps / 128–256 MiB of additional unique snapshots. Large work may hit machine memory limits earlier.
+
+In **Face Studio**, manually select the mesh/texture and create a **New face preset** or mark any shared region as a **Face preset**. Name it as useful for your avatar; there is no anatomy or face detection assumption. Use the same UV/mask/color controls for precise work. **Paint with existing tools** activates the matching color Painting session and shows its real brushes/layers/output below. If another color session is open, save/stop it or adopt that target; it is never discarded. Region masks constrain Colorway recoloring; existing paint brushes keep their ordinary layer behavior. Face painting requires identity material tiling/offset because the retained painter uses raw UVs. Capture a new composite explicitly to bring painting edits into the frozen Colorway baseline. While Face painting is active, Compare uses that composite as the after snapshot.
+
 ## Develop and verify
 
 - `python3 tools/verify_repository.py`: package/GUID/shader/license/provenance integrity.
-- `dotnet run --project Tests/FileSafety/FileSafety.csproj -- <absolute-repository-path>`: .NET 8 filesystem regressions and C# 9 syntax parsing using SDK-bundled Roslyn. This is **not Unity compilation**. Symlink tests need permission to create links.
+- `dotnet run --project Tests/FileSafety/FileSafety.csproj -- <absolute-repository-path>`: .NET 8 filesystem, UV, region, color, history and sidecar regressions, plus C# 9 syntax parsing using SDK-bundled Roslyn. This is **not Unity compilation**. Symlink tests need permission to create links.
 - Open **Tests/UnityProject** in licensed Unity 2022.3.22f1. Its local dependency points at this checkout and Player settings declare Linear. Run the preserved GPU suite and Studio checks with [Windows QA commands](docs/WINDOWS_QA.md), never in an avatar project.
 
 [SPEC](SPEC.md) · [PLAN](PLAN.md) · [architecture](docs/ARCHITECTURE.md) · [upstream audit](docs/UPSTREAM.md) · [verification](docs/VERIFICATION.md) · [HANDOFF](HANDOFF.md).

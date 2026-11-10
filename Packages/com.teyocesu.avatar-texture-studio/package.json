@@ -1,9 +1,9 @@
 {
   "name": "com.teyocesu.avatar-texture-studio",
   "displayName": "Avatar Texture Studio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "2022.3",
-  "description": "Editor-only avatar texture painting, layers, shader masks, editable projects, safe PNG export and read-only TextureLab comparison. Derived from MIT VRC Texture Painter.",
+  "description": "Editor-only avatar painting, UV inspection, editable region Colorways, manual Face Studio, safe PNG export and TextureLab comparison. Derived from MIT VRC Texture Painter.",
   "author": {
     "name": "Teyocesu",
     "url": "https://github.com/Teyocesu"

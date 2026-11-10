@@ -1,4 +1,50 @@
-# Shot 1 verification — 2026-11-09
+# Shot 2 verification — 2026-11-10
+
+**Implemented but not accepted.** Scope is `codex/shot-2-creative-studio` from exact Shot 1 base `9b1d2f0e43883079e5a3596a49832cbd0668b77e`. [Draft PR #2](https://github.com/Teyocesu/Avatar-Texture-Studio/pull/2), authored by Teyocesu, targets `codex/shot-1-painting-foundation`, never main. Shot 1 remains unaccepted. Git and the stacked PR record the final delivery head; this report does not claim actual Unity compilation or rendering.
+
+## Executed environment and checks
+
+The Apple Silicon macOS host still has no Unity editor/Hub in PATH, Spotlight or standard installation locations, and no usable editor/license pair. Physical Windows 11 and a Windows graphics device are unavailable. No owner avatar project was opened. The temporary official .NET 8.0.427 SDK is outside the repository; its actual C# code compiles/runs only the pure core and file helper. No SDK, Unity stand-in or native binary ships in the package.
+
+| Classification | Current evidence |
+| --- | --- |
+| **Automatically tested — executed, exit 0** | `dotnet run --project Tests/FileSafety/FileSafety.csproj -- <absolute-repository>` retains every existing filesystem regression and adds real CPU checks for ray/source UV/material transform correspondence, slot/channel identity, reverse overlap and equal-depth ambiguity, mirrored/negative/out-of-range wrapping, collapsed UVs and tile ceilings. These geometry tests passed before mask-derived operations were implemented. |
+| **Automatically tested — executed, exit 0** | The same harness executes binary triangle masks, immutable subtract refinement, continuous capsule strokes, exact unselected RGBA/all-alpha preservation, Oklab published red reference and lightness tolerance, sRGB/linear semantics, identity/zero-strength no-ops, cancelled rendering, Undo/Redo and editable sidecar round trips for masks/parameters/Face flags/binding/navigation. Invalid magic/version/length/truncation/dimensions/text/trailing data and invalid replacement state are rejected. These are real synthetic CPU inputs, not Unity/GPU mocks. |
+| **Automatically tested — executed, exit 0** | SDK Roslyn parses **24 package/Unity-harness C# files as C# 9**, with no syntax errors. The pure production core and SafeFileIO compile under .NET 8. This is **not semantic compilation against Unity assemblies**. |
+| **Automatically tested — executed, exit 0** | `python3 tools/verify_repository.py --archive artifacts/com.teyocesu.avatar-texture-studio-0.2.0.tgz`: original inventory retained, all original metas/test bodies preserved, **60 unique asset GUIDs**, six stamp references and five shader references resolve; Editor-only/dependency/identity/licensing/harness checks pass; tarball member names and bytes exactly match the installable package. Existing integrity checks and allowlists were not weakened. |
+| **Automatically tested — executed, exit 0** | `python3 tools/package.py` builds the local 0.2.0 UPM tarball. Both Python tools parse successfully. The complete Shot 2 delta passes `git diff --check` against its exact Shot 1 base, including newly added files. The historical main-relative whitespace exception below belongs to unchanged upstream metas. |
+| **Inspected** | Reviewed the complete stacked diff and new source for scope, source-asset safety, state/lifecycle routing, compatibility, file bounds, ownership, licensing and verification weakening. Painting core changes only expose the existing bake-matrix/pose-hash helpers; upstream GPU arithmetic, PaintProjectIO, PaintSession and all original assertions are unchanged on this branch. Main UI adds the shared workspaces/companion/recovery routing; TextureLab adds explicitly owned snapshots while its default asset-only validation stays intact. No tests/assertions were deleted, skipped or relaxed; no suppressions, lowered thresholds, disabled checks, fake frameworks, empty failure catches or placeholder feature buttons were introduced. |
+| **Inspected, corrected before delivery** | Review caught preview sampler wrap/transform precision issues and missing Face entry guards. Owned model textures now use saved wrap modes, ordinary mips and bound-source filtering; the geometry key retains exact float transform values. Face creation shares color-source checks and preserves scene-instance/non-UV/decal/channel/tiling safeguards instead of bypassing Painting setup. These are new Shot 2 integration corrections, not demonstrated regressions on Shot 1's unchanged branch. |
+| **Simulated** | Existing filesystem tests deliberately inject writer and documented Win32 partial-replacement failures using real files. They do not execute actual Unity Mono/Windows failures. No simulated Unity/GPU acceptance was used. |
+| **Manually validated** | No native product workflow, physical input, rendering or avatar interaction was manually validated. Reading source is classified as inspected. |
+| **NOT TESTED** | Actual Unity import/API/shader compilation, both Unity suites, GPU color capture/preview/readback/mips/PNG import, posed skinning, Scene/IMGUI controls, preview restoration, Play/reload/close recovery, tablet input, native Mono/Windows file replacement, Windows visuals/avatar integration and macOS Metal. These are unavailable, not inferred passes. |
+| **Blocked** | Acceptance of both shots requires a licensed Unity 2022.3.22f1 / Built-in / Linear / Windows 11 DX11 environment and actual critical manual QA. Follow [WINDOWS_QA.md](WINDOWS_QA.md); no Shot 3/merge/release is authorized by this evidence. |
+
+## Reproduced sidecar regression
+
+The focused assertion `missing gzip footer bytes are rejected even when the editable payload is complete` first failed with exit **1**: truncating four footer bytes still returned a fully decoded creative document on .NET 8. The initial gzip-only loader therefore could accept an incomplete file. ATSCRV01 version 1 now declares and checks its compressed-byte length before decompression. The identical assertion passes afterward with exit **0**, alongside full payload truncation, hostile dimensions/text and decoded-tail rejection. The format changed before any Shot 2 sidecar was delivered; MTPAINT1/2 bytes and loaders were not changed.
+
+All old filesystem checks still execute, including real successful local File.Replace and injected partial-native-failure recovery. The new format uses the same SafeFileIO replacement path. Neither this regression nor a successful macOS filesystem run proves Unity Mono/Windows crash durability.
+
+## Native checks authored, not executed
+
+`AvatarTextureStudio.Tests.StudioTests.Run` retains all previous checks and invokes `CreativeIntegrationTests.Run`. The added synthetic Unity checks cover source UV7/material submesh association, pose refresh without source mutation, sRGB/alpha/orientation capture through the actual GPU readback bridge, source image/meta preservation, Library/SessionState clean-state recovery, failed-open retention and owned-snapshot admission with default asset-only validation intact. They have **not run**. The upstream `AvatarTextureStudio.Painting.Tests.MTPTests.Run` body is unchanged and remains equally required.
+
+The updated Windows checklist additionally covers ambiguity choices, raw/wrapped/outside/degenerate UVs, skinning, sparse brush events, region isolation, linear/sRGB/gamut/alpha, same-size rebase Undo, source filtering/wrap/mips, new PNG size/import safety, editable companions and partial saves, all-tab recovery, Face layer tools, snapshot comparisons and negative scope.
+
+## Current artifact and limits
+
+Local ignored artifact: `artifacts/com.teyocesu.avatar-texture-studio-0.2.0.tgz`, **167307 bytes**, SHA-256 **`8ae7a8c9824376074052c0c19052a1e84ff507d0fd088299bee23fbb14176302`**. This is a structurally verified local package, not a Unity-tested installation or published release.
+
+Custom shader correspondence remains unverified; geometric UV1–UV7 inspection does not infer arbitrary shader sampling. Triangle masks/model previews are restricted to ordinary supported mappings. Shared/mirrored texels cannot isolate surfaces. Clamp/MirrorOnce border collapse and degenerate areas are explicit. Geometry, tile, image, decoded-data and session-history bounds are documented in SPEC/architecture; large-scene/image performance is unmeasured. Picking is two-sided within the selected renderer, not scene-wide occlusion. Colorway is RGBA8 with Oklab lightness preservation, not HDR or exact physical-luminance processing. Regions stay separate from existing paint layers. Face brushes keep their upstream layer behavior; masks constrain recoloring. Pair saving is not a multi-file transaction and restart recovery is manual. Retained GUIDs still prevent co-installation with upstream.
+
+API/source references and the exact sidecar layout are recorded in [ARCHITECTURE.md](ARCHITECTURE.md). Actual acceptance remains **NOT TESTED/blocked** despite implementation completion.
+
+---
+
+# Shot 1 verification — 2026-11-09 (historical)
+
+The following record describes Shot 1 at its own delivery boundary. Its original artifact/counts and statement that Shot 2 had not started are historical, not the status of this stacked branch.
 
 **Implemented but not accepted.** Scope: `codex/shot-1-painting-foundation` relative to baseline `12bf05d397c46dbab7a12f438cf0878d217b52a9`, including the independent-review correction starting at `ddba6efc50c6213239c67c38f386742d2335bed7`. Final delivery commits are recorded by Git and draft PR #1. This report does not assert successful Unity compilation or rendering.
 

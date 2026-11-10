@@ -7,6 +7,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 using AvatarTextureStudio.TextureLab;
+using AvatarTextureStudio.Creative;
 
 namespace AvatarTextureStudio.Painting
 {
@@ -23,7 +24,7 @@ namespace AvatarTextureStudio.Painting
         static readonly PaintTool[] MaskTools = { PaintTool.HardBrush, PaintTool.SoftBrush, PaintTool.Blur, PaintTool.Eraser, PaintTool.Gradient, PaintTool.Stamp };
         static readonly string[] MaskToolNames = { "Hard", "Soft", "Blur", "Eraser", "Gradient", "Stamp" };
         static readonly string[] MaskChannelNames = { "R", "G", "B", "White", "Black" };
-        static readonly string[] TabNames = { "Painting", "Masks", "Compare" };
+        static readonly string[] TabNames = { "Painting", "Masks", "Compare", "UV Explorer", "Colorway", "Face Studio" };
         static readonly TextureWrapMode[] WrapOptions = { TextureWrapMode.Repeat, TextureWrapMode.Repeat, TextureWrapMode.Clamp, TextureWrapMode.Mirror, TextureWrapMode.MirrorOnce };
 
         [Serializable]
@@ -63,12 +64,14 @@ namespace AvatarTextureStudio.Painting
         [SerializeField] PainterTab colorTab = new PainterTab { mode = PaintMode.Color };
         [SerializeField] PainterTab maskTab = new PainterTab { mode = PaintMode.Mask };
         [SerializeField] TextureComparePanel comparison = new TextureComparePanel();
+        [SerializeField] CreativeWorkspace creative = new CreativeWorkspace();
 
         bool strokeFoldout = true;
         bool helpFoldout;
         bool assignOnExport;
         bool discardOnClose;
         Vector2 compareScroll;
+        Vector2 creativeScroll;
         readonly List<PaintLayer> displayLayers = new List<PaintLayer>();
         Material thumbnailMaterial;
         string lastError;
@@ -100,9 +103,12 @@ namespace AvatarTextureStudio.Painting
         {
             titleContent = new GUIContent("Avatar Texture Studio", EditorGUIUtility.IconContent("d_Grid.PaintTool").image);
             minSize = new Vector2(460, 420);
-            tabIndex = Mathf.Clamp(tabIndex, 0, 2);
+            tabIndex = Mathf.Clamp(tabIndex, 0, TabNames.Length - 1);
             if (comparison == null) comparison = new TextureComparePanel();
-            saveChangesMessage = "Save the editable painting and mask projects before closing Avatar Texture Studio?";
+            if (creative == null) creative = new CreativeWorkspace();
+            creative.Initialize(SessionChanged, Repaint);
+            if (tabIndex >= 3 && !EditorApplication.isPlayingOrWillChangePlaymode) creative.Enter();
+            saveChangesMessage = "Save editable painting, mask and creative projects before closing Avatar Texture Studio?";
             if (colorTab == null) colorTab = new PainterTab();
             if (maskTab == null) maskTab = new PainterTab();
             colorTab.mode = PaintMode.Color;
@@ -118,6 +124,8 @@ namespace AvatarTextureStudio.Painting
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
             EditorApplication.playModeStateChanged -= OnPlayModeChanged;
             EditorApplication.delayCall -= TryRestore;
+            if (discardOnClose) creative?.DiscardRecovery();
+            else SaveCreativeRecovery();
             foreach (var tab in Tabs)
             {
                 tab.settings?.Save();
@@ -127,16 +135,19 @@ namespace AvatarTextureStudio.Painting
             }
             if (thumbnailMaterial != null) DestroyImmediate(thumbnailMaterial);
             comparison?.Dispose();
+            creative?.Dispose();
             PaintResources.Release();
         }
 
-        void OnLostFocus() => comparison?.EndInteraction();
+        void OnLostFocus() { comparison?.EndInteraction(); creative?.EndInteraction(); }
 
         public override void SaveChanges()
         {
             foreach (var tab in Tabs)
                 if (tab.session != null && tab.session.Dirty && !SaveProject(tab, false))
                     throw new OperationCanceledException("Painting project save was cancelled or failed; the window remains open.");
+            if (creative != null && creative.Dirty && !creative.Save(false))
+                throw new OperationCanceledException("Creative project save was cancelled or failed; the window remains open.");
             base.SaveChanges();
         }
 
@@ -148,7 +159,7 @@ namespace AvatarTextureStudio.Painting
 
         void SessionChanged()
         {
-            hasUnsavedChanges = Tabs.Any(t => t.session != null && t.session.Dirty);
+            hasUnsavedChanges = Tabs.Any(t => t.session != null && t.session.Dirty) || (creative != null && creative.Dirty);
             Repaint();
         }
 
@@ -166,6 +177,7 @@ namespace AvatarTextureStudio.Painting
 
         void OnBeforeAssemblyReload()
         {
+            SaveCreativeRecovery();
             foreach (var tab in Tabs)
                 if (tab.session != null) Autosave(tab);
         }
@@ -174,6 +186,7 @@ namespace AvatarTextureStudio.Painting
         {
             if (change == PlayModeStateChange.ExitingEditMode)
             {
+                SaveCreativeRecovery();
                 foreach (var tab in Tabs)
                     if (tab.session != null) Autosave(tab);
             }
@@ -207,6 +220,15 @@ namespace AvatarTextureStudio.Painting
         {
             LoadSettings();
             foreach (var tab in Tabs) TryRestore(tab);
+            try { creative.TryRestore(); }
+            catch (Exception e) { lastError = "Creative recovery failed; recovery file retained: " + e.Message; Debug.LogException(e); }
+            if (tabIndex >= 3 && !EditorApplication.isPlayingOrWillChangePlaymode) creative.Enter();
+        }
+
+        void SaveCreativeRecovery()
+        {
+            try { creative?.Autosave(); }
+            catch (Exception e) { lastError = "Creative autosave failed. Save the .atsstudio project manually: " + e.Message; Debug.LogException(e); }
         }
 
         void TryRestore(PainterTab tab)
@@ -273,8 +295,10 @@ namespace AvatarTextureStudio.Painting
             if (index == tabIndex) return;
             if (tabIndex == 2) comparison.EndInteraction();
             if (tabIndex < 2) Tab.session?.Deactivate();
+            if (tabIndex >= 3) { colorTab.session?.Deactivate(); creative.Leave(); }
             tabIndex = index;
             if (tabIndex < 2) Tab.session?.Activate();
+            if (tabIndex >= 3 && !EditorApplication.isPlayingOrWillChangePlaymode) creative.Enter();
             lastError = null;
             Repaint();
         }
@@ -309,10 +333,17 @@ namespace AvatarTextureStudio.Painting
 
             var tab = Tab;
             if (tabIndex == 2) compareScroll = EditorGUILayout.BeginScrollView(compareScroll);
+            else if (tabIndex >= 3) creativeScroll = EditorGUILayout.BeginScrollView(creativeScroll);
             else tab.scroll = EditorGUILayout.BeginScrollView(tab.scroll);
             try
             {
                 if (tabIndex == 2) comparison.Draw(Repaint);
+                else if (tabIndex >= 3)
+                {
+                    creative.Draw(tabIndex, colorTab.session, color => { colorTab.settings.color = color; colorTab.settings.Save(); },
+                        (before, after) => { comparison.SetPreviews(before, after); SelectTab(2); GUIUtility.ExitGUI(); }, StartFacePainting);
+                    if (tabIndex == 5 && creative.Painting && colorTab.session != null) DrawSession(colorTab);
+                }
                 else if (GraphicsSettings.currentRenderPipeline != null)
                     EditorGUILayout.HelpBox("Painting requires the Built-in Render Pipeline. Compare remains available.", MessageType.Warning);
                 else if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -336,7 +367,33 @@ namespace AvatarTextureStudio.Painting
             }
         }
 
-        static List<string> TextureProperties(Material mat)
+        bool StartFacePainting()
+        {
+            if (GraphicsSettings.currentRenderPipeline != null) { lastError = "Painting requires the Built-in Render Pipeline."; return false; }
+            var material = creative.Renderer != null && creative.Slot < creative.Renderer.sharedMaterials.Length ? creative.Renderer.sharedMaterials[creative.Slot] : null;
+            if (material == null || !ColorTextureProperties(material).Contains(creative.Property)) { lastError = "Select a supported color texture property before painting."; return false; }
+            string sourceError = creative.ColorSourceError();
+            if (sourceError != null) { lastError = sourceError; return false; }
+            if (EditorUtility.IsPersistent(creative.Renderer)) { lastError = "Choose a scene instance rather than a prefab/model asset for Face painting."; return false; }
+            if (UsesNonUVMapping(material, creative.Property) || DecalTransformWarning(material, creative.Property) != null)
+            { lastError = "The selected mapping is not supported by the existing UV painter. Choose a supported UV mode and untransformed decal."; return false; }
+            int shaderChannel = ShaderUVMode(material, creative.Property);
+            if (shaderChannel >= 0 && shaderChannel <= 3 && shaderChannel != creative.Channel)
+            { lastError = $"Select the shader's UV{shaderChannel} channel before Face painting."; return false; }
+            if (material.GetTextureScale(creative.Property) != Vector2.one || material.GetTextureOffset(creative.Property) != Vector2.zero)
+            { lastError = "The existing painter uses raw mesh UVs. Reset material tiling/offset before starting Face painting; Colorway correspondence can still inspect those transforms."; return false; }
+            if (colorTab.session == null)
+            {
+                var session = PaintSession.Create(creative.Renderer, new[] { creative.Slot }, new[] { new PartSpec { textureProperty = creative.Property, uvChannel = creative.Channel } },
+                    colorTab.padding, colorTab.settings, out string error);
+                if (session == null) { lastError = error; return false; }
+                AttachSession(colorTab, session);
+            }
+            if (!colorTab.session.Parts.Any(creative.Matches)) { lastError = "Painting already has a session for a different target. Save/stop it in Painting, or use that session's target in Face Studio."; return false; }
+            colorTab.session.Activate(); return true;
+        }
+
+        internal static List<string> TextureProperties(Material mat)
         {
             var list = new List<string>();
             if (mat == null || mat.shader == null) return list;
@@ -372,7 +429,7 @@ namespace AvatarTextureStudio.Painting
         /// The shader's UV mode for a texture, or -1 if it has none. Poiyomi stores it in "&lt;property&gt;UV",
         /// lilToon in "&lt;property&gt;_UVMode". 0-3 = UV0-UV3, higher values are other mappings.
         /// </summary>
-        static int ShaderUVMode(Material mat, string property)
+        internal static int ShaderUVMode(Material mat, string property)
         {
             if (mat == null) return -1;
             foreach (var name in new[] { property + "UV", property + "_UVMode" })
@@ -405,7 +462,7 @@ namespace AvatarTextureStudio.Painting
             }
         }
 
-        static string DecalTransformWarning(Material mat, string property)
+        internal static string DecalTransformWarning(Material mat, string property)
         {
             if (mat == null || !property.StartsWith("_DecalTexture", StringComparison.Ordinal)) return null;
             string n = property.Substring("_DecalTexture".Length);
@@ -740,7 +797,12 @@ namespace AvatarTextureStudio.Painting
             var opened = PaintSession.Open(path, tab.renderer, owner.settings, out string error);
             if (owner != tab) SelectTab(owner.IsMask ? 1 : 0);
             lastError = error;
-            if (opened != null) AttachSession(owner, opened);
+            if (opened != null)
+            {
+                AttachSession(owner, opened);
+                string companion = path + ".atsstudio";
+                if (!owner.IsMask && File.Exists(companion) && creative.ConfirmReplace()) creative.Open(companion, opened);
+            }
             GUIUtility.ExitGUI();
         }
 
@@ -762,7 +824,7 @@ namespace AvatarTextureStudio.Painting
                 if (GUILayout.Button("Save As", EditorStyles.toolbarButton)) SaveProject(tab, true);
                 if (GUILayout.Button("Stop", EditorStyles.toolbarButton))
                 {
-                    if (ConfirmCloseSession(tab)) CloseSession(tab);
+                    if (ConfirmCloseSession(tab)) { CloseSession(tab); creative.StopPainting(); }
                     GUIUtility.ExitGUI();
                 }
             }
@@ -1366,6 +1428,16 @@ namespace AvatarTextureStudio.Painting
             {
                 EditorUtility.DisplayProgressBar("Avatar Texture Studio", "Saving project...", 0.5f);
                 session.SaveProject(path);
+                EditorUtility.ClearProgressBar();
+                if (!tab.IsMask && creative.Related(session))
+                {
+                    try
+                    {
+                        if (!creative.SaveCompanion(path + ".atsstudio"))
+                        { lastError = "Painting saved. Creative companion replacement was cancelled; creative work remains unsaved."; return false; }
+                    }
+                    catch (Exception e) { throw new IOException("Painting saved, but its creative companion failed. Creative work remains dirty; save the .atsstudio separately. " + e.Message, e); }
+                }
                 string projectRoot = Path.GetFullPath(".").Replace('\\', '/') + "/";
                 if (path.Replace('\\', '/').StartsWith(projectRoot, StringComparison.OrdinalIgnoreCase)) AssetDatabase.Refresh();
                 lastError = null;

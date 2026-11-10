@@ -318,7 +318,7 @@ namespace AvatarTextureStudio.Painting
         /// depending on Unity version and flags. Compare a few vertices against
         /// manual skinning and pick the matrix that reproduces the real pose.
         /// </summary>
-        static Matrix4x4 ResolveBakeMatrix(SkinnedMeshRenderer smr, Mesh source, Mesh baked)
+        internal static Matrix4x4 ResolveBakeMatrix(SkinnedMeshRenderer smr, Mesh source, Mesh baked)
         {
             var t = smr.transform;
             var withScale = t.localToWorldMatrix;
@@ -368,7 +368,7 @@ namespace AvatarTextureStudio.Painting
             total += weight;
         }
 
-        int ComputePoseHash()
+        internal int ComputePoseHash()
         {
             if (Renderer == null) return 0;
             unchecked

@@ -22,16 +22,24 @@ namespace AvatarTextureStudio.TextureLab
         [SerializeField] Vector2 pan;
         [NonSerialized] Material material;
         [NonSerialized] int dragControl;
+        [NonSerialized] bool ownedPreviews;
+
+        public void SetPreviews(Texture2D before, Texture2D after)
+        {
+            textureA = before; textureB = after; ownedPreviews = true;
+            rawValues = false; alphaOnly = false; view = 0; ResetNavigation();
+        }
 
         public void Draw(Action repaint)
         {
             if (Event.current.rawType == EventType.MouseUp) EndInteraction();
             EditorGUILayout.LabelField("TextureLab · Compare", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox("Read-only imported assets. Painting and mask sessions stay open while you compare. CPU Read/Write access is not required.", MessageType.Info);
+            EditorGUILayout.HelpBox(ownedPreviews ? "Read-only creative snapshots. Editable masks, adjustments and painting layers stay in their workspaces. Select assets below to return to asset comparison."
+                : "Read-only imported assets. Painting and mask sessions stay open while you compare. CPU Read/Write access is not required.", MessageType.Info);
             EditorGUI.BeginChangeCheck();
             textureA = (Texture2D)EditorGUILayout.ObjectField("Texture A", textureA, typeof(Texture2D), false);
             textureB = (Texture2D)EditorGUILayout.ObjectField("Texture B", textureB, typeof(Texture2D), false);
-            if (EditorGUI.EndChangeCheck()) ResetNavigation();
+            if (EditorGUI.EndChangeCheck()) { ownedPreviews = false; ResetNavigation(); }
             DrawMetadata("A", textureA);
             DrawMetadata("B", textureB);
 
@@ -51,8 +59,8 @@ namespace AvatarTextureStudio.TextureLab
             }
             EditorGUILayout.LabelField("Scroll to zoom · drag to pan · double click to fit. Navigation is shared in normalized image coordinates.", EditorStyles.wordWrappedMiniLabel);
 
-            string errorA = UnsupportedReason(textureA);
-            string errorB = UnsupportedReason(textureB);
+            string errorA = UnsupportedReason(textureA, ownedPreviews);
+            string errorB = UnsupportedReason(textureB, ownedPreviews);
             if (textureA != null && errorA != null) EditorGUILayout.HelpBox("A: " + errorA, MessageType.Warning);
             if (textureB != null && errorB != null) EditorGUILayout.HelpBox("B: " + errorB, MessageType.Warning);
             bool mismatch = textureA != null && textureB != null && (textureA.width != textureB.width || textureA.height != textureB.height);
@@ -157,11 +165,14 @@ namespace AvatarTextureStudio.TextureLab
         void ResetNavigation() { EndInteraction(); zoom = 1f; pan = Vector2.zero; }
         static bool IsSRGB(Texture texture) => GraphicsFormatUtility.IsSRGBFormat(texture.graphicsFormat);
 
-        internal static string UnsupportedReason(Texture2D texture)
+        internal static string UnsupportedReason(Texture2D texture) => UnsupportedReason(texture, false);
+
+        internal static string UnsupportedReason(Texture2D texture, bool allowOwnedPreview)
         {
             if (texture == null) return "Select a Texture2D asset.";
-            if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(texture))) return "Select an imported asset from the Project window.";
-            var importer = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(texture)) as TextureImporter;
+            if (!allowOwnedPreview && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(texture))) return "Select an imported asset from the Project window.";
+            string path = AssetDatabase.GetAssetPath(texture);
+            var importer = string.IsNullOrEmpty(path) ? null : AssetImporter.GetAtPath(path) as TextureImporter;
             if (importer != null && importer.textureType == TextureImporterType.NormalMap)
                 return "Normal-map imports use platform-specific packing. Compare plain color/data copies instead; source import settings will not be changed.";
             if (importer != null && importer.vtOnly) return "Virtual-texture-only assets have no ordinary sampled preview.";
@@ -181,7 +192,7 @@ namespace AvatarTextureStudio.TextureLab
         {
             if (texture == null) return;
             string path = AssetDatabase.GetAssetPath(texture);
-            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            var importer = string.IsNullOrEmpty(path) ? null : AssetImporter.GetAtPath(path) as TextureImporter;
             string source = "";
             if (importer != null)
             {

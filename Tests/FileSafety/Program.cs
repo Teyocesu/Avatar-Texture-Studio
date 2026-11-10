@@ -76,6 +76,8 @@ internal static class Program
             Require(replacementError.Message.Contains(completed) && replacementError.Message.Contains(backup),
                 "replacement error identifies both recovery files");
 
+            CreativeCoreTests.Run();
+
             string root = args.Length == 0 ? Directory.GetCurrentDirectory() : args[0];
             var sources = Directory.EnumerateFiles(Path.Combine(root, "Packages"), "*.cs", SearchOption.AllDirectories)
                 .Concat(Directory.EnumerateFiles(Path.Combine(root, "Tests", "UnityProject", "Assets"), "*.cs", SearchOption.AllDirectories)).ToArray();
